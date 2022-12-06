@@ -3,27 +3,27 @@
 //https://www.tradingview.com/v/WWqoUu7e/
 //
 //@version=5
-indicator(title='OB+PVP', overlay=true, max_lines_count = 500, max_boxes_count = 500, max_bars_back = 5000)
+indicator(title='OB+PVP+Weeknd', overlay=true, max_lines_count = 500, max_boxes_count = 500, max_bars_back = 5000)
 
 bool        pv2_sv          = input.bool        (false,                          title='Plot 2nd order pivots')
-bool        msb_sv          = input.bool        (true,                          title='Plot MSB lines')
-bool        box_sv          = input.bool        (true,                          title='Plot Orderblocks')
+bool        msb_sv          = input.bool        (true,                           title='Plot MSB lines')
+bool        box_sv          = input.bool        (true,                           title='Plot Orderblocks')
 bool        m_sv            = input.bool        (false,                          title='Plot Breakerblocks')
-bool        range_sv        = input.bool        (true,                          title='Plot Range')
-bool        range_eq_sv     = input.bool        (true,                          title='Plot Range 0.5 Line')
-bool        range_q_sv      = input.bool        (true,                          title='Plot Range 0.25 and 0.75 Lines')
+bool        range_sv        = input.bool        (true,                           title='Plot Range')
+bool        range_eq_sv     = input.bool        (true,                           title='Plot Range 0.5 Line')
+bool        range_q_sv      = input.bool        (true,                           title='Plot Range 0.25 and 0.75 Lines')
 bool        log_sv          = input.bool        (false,                          title='Use Log Scale')
 bool        msb_a_sv        = input.bool        (false,                          title='Alert MSB')
 bool        ob_a_sv         = input.bool        (false,                          title='Alert Orderblock test')
 bool        bb_a_sv         = input.bool        (false,                          title='Alert Breakerblock test')
 bool        r_a_sv          = input.bool        (false,                          title='Alert New Range')
 bool        rt_a_sv         = input.bool        (false,                          title='Alert Range test')
-color       u_s             = input.color       (color.rgb(192, 192, 192, 70),  title='Untested Supply Color')
-color       t_s             = input.color       (color.rgb(255, 0, 0, 70),      title='Tested Supply Color')
-color       u_d             = input.color       (color.rgb(192, 192, 192, 70),  title='Untested Demand Color')
-color       t_d             = input.color       (color.rgb(0, 255, 0, 80),      title='Tested Demand Color')
-color       u_b             = input.color       (color.rgb(192, 192, 192, 70),  title='Untested Breaker Color')
-color       t_b             = input.color       (color.new(color.blue, 70),     title='Tested Breaker Color')
+color       u_s             = input.color       (color.new(#089981, 70),         title='Untested Supply Color')
+color       t_s             = input.color       (color.new(#b2b5be, 70),         title='Tested Supply Color')
+color       u_d             = input.color       (color.new(#f23645, 70),         title='Untested Demand Color')
+color       t_d             = input.color       (color.new(#b2b5be, 70),         title='Tested Demand Color')
+color       u_b             = input.color       (color.new(#ff9800, 70),         title='Untested Breaker Color')
+color       t_b             = input.color       (color.new(#b2b5be, 70),         title='Tested Breaker Color')
 
 var float[] pvh1_price      = array.new_float   (30, na)            // high
 var int[]   pvh1_time       = array.new_int     (30, na)
@@ -76,13 +76,18 @@ bool        new_ph_2nd      = false
 bool        new_pl_2nd      = false
 string      alert           = na
 
+multiplier = input.float(2.6, minval=0, maxval=10, step=0.02, group = "Weekend")
+
+day_clr = dayofweek < 2 or dayofweek > 6 ? color.new(#9598a1, 75) : color.new(#9598a1, 100)
+//plot(((high / low) * ohlc4) * (1 + multiplier / 100), style=plot.style_areabr, color=day_clr)
+plot( ((low / high) * ohlc4) * (1 - multiplier / 100), style=plot.style_areabr, color=day_clr)
 
 tf = input.timeframe("D", title = "Timeframe", inline = "0", group = "PROFILE SETTINGS")
 mdr = input.float(4, minval = 1,maxval = 4,title = "Sensitivity ", inline = "1", group = "PROFILE SETTINGS", tooltip = "Higher = More Granular\nLower = Less Granular")
 vap = input.float(70, title = "Value Area %", inline = "1_1", group = "PROFILE SETTINGS")/100
 mp = input.bool(false, title = "Calculate As Market Profile", inline = "2", group = "PROFILE SETTINGS", tooltip = "Calculations will distribue a 1 instead of the candle's volume.")
 disp_size = input.int(-30, minval = -500,maxval = 500,title  = "Display Size   ", inline = "3", group = "DISPLAY SETTINGS", tooltip = "The entire range of your profile will scale to fit inside this range.\nNotes:\n-This value is # bars away from your profile's axis.\n-The larger this value is, the more granular your (horizontal) view will be. This does not change the Profiles' value; because of this, sometimes the POC looks tied with other values widely different. The POC CAN be tied to values close to it, but if the value is far away it is likely to just be a visual constraint.\n-This Value CAN be negative")
-prof_offset = input.int(30, minval = -500,maxval = 500, title  = "Display Offset", inline = "4", group = "DISPLAY SETTINGS", tooltip = "Offset your profile's axis (Left/Right) to customize your display to fit your style.\nNotes:\n-Zero = Current Bar\n-This Value CAN be negative")
+prof_offset = input.int(40, minval = -500,maxval = 500, title  = "Display Offset", inline = "4", group = "DISPLAY SETTINGS", tooltip = "Offset your profile's axis (Left/Right) to customize your display to fit your style.\nNotes:\n-Zero = Current Bar\n-This Value CAN be negative")
 extend_day = input.bool(true, title = "Display Current POC/VAH/VAL", inline = "5", group = "Additional Data Displays")
 hist = input.bool(true, title = "Display Historical POC/VAH/VAL", inline = "6", group = "Additional Data Displays")
 poc_color = input.color(#ff033e, title = "POC Color", group = "Colors")
@@ -237,10 +242,10 @@ if barstate.isconfirmed
         temp_pv_0 := log_sv ? math.exp((math.log(last_range_h) + math.log(last_range_l))/2) : (last_range_h + last_range_l)/2
         temp_pv_1 := log_sv ? math.exp((math.log(last_range_h) + math.log(temp_pv_0))/2) : (last_range_h + temp_pv_0)/2
         temp_pv_2 := log_sv ? math.exp((math.log(last_range_l) + math.log(temp_pv_0))/2) : (last_range_l + temp_pv_0)/2
-        array.push(range_h_lines, line.new(x1=temp_time, y1=last_range_h, x2=bar_index, y2=last_range_h, color=color.gray, width=1, extend=extend.right))
-        array.push(range_l_lines, line.new(x1=temp_time, y1=last_range_l, x2=bar_index, y2=last_range_l, color=color.gray, width=1, extend=extend.right))
+        array.push(range_h_lines, line.new(x1=temp_time, y1=last_range_h, x2=bar_index, y2=last_range_h, color=color.black, width=2, extend=extend.right))
+        array.push(range_l_lines, line.new(x1=temp_time, y1=last_range_l, x2=bar_index, y2=last_range_l, color=color.black, width=2, extend=extend.right))
         if range_eq_sv
-            array.push(range_m_lines, line.new(x1=temp_time, y1=temp_pv_0, x2=bar_index, y2=temp_pv_0, color=color.gray, width=1, extend=extend.right))
+            array.push(range_m_lines, line.new(x1=temp_time, y1=temp_pv_0, x2=bar_index, y2=temp_pv_0, color=color.gray, width=2, extend=extend.right))
         if range_q_sv
             array.push(range_25_lines, line.new(x1=temp_time, y1=temp_pv_1, x2=bar_index, y2=temp_pv_1, style=line.style_dashed, color=color.gray, width=1, extend=extend.right))
             array.push(range_75_lines, line.new(x1=temp_time, y1=temp_pv_2, x2=bar_index, y2=temp_pv_2, style=line.style_dashed, color=color.gray, width=1, extend=extend.right))
