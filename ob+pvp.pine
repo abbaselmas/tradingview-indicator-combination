@@ -439,17 +439,12 @@ if extend_day
     line.delete(d_vah[1])
     line.delete(d_val[1])
 
-lab = label.new(bar_index+prof_offset,roof, text = (mp?"Market Profile [":"Volume Profile [") + tf + "]\nGranularity: " + str.tostring(tick_size,"$#.##########"), style = (disp_size<0?label.style_label_lower_right:label.style_label_lower_left), color = color.rgb(0,0,0,100), textcolor = chart.fg_color, textalign = (disp_size<0?text.align_left:text.align_right), text_font_family = font.family_monospace)
-label.delete(lab[1])
-
 alertcondition(ta.crossover(close,poc), "Cross-Over Point of Control")
 alertcondition(ta.crossunder(close,poc), "Cross-Under Point of Control")
 alertcondition(ta.crossover(close,vah), "Cross-Over Value High")
 alertcondition(ta.crossunder(close,vah), "Cross-Under Value High")
 alertcondition(ta.crossover(close,val), "Cross-Over Value Low")
 alertcondition(ta.crossunder(close,val),"Cross-Under Value Low")
-
-
 
 //---------------------------- Constants ------------------------------
 
