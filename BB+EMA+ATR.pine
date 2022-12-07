@@ -1,0 +1,38 @@
+//@version=2
+study(title="BBs+ATR", overlay = true)
+
+nATRPeriod = input(5)
+nATRMultip = input(2)
+xATR = atr(nATRPeriod)
+nLoss = nATRMultip * xATR
+xATRTrailingStop = iff(close > nz(xATRTrailingStop[1], 0) and close[1] > nz(xATRTrailingStop[1], 0), max(nz(xATRTrailingStop[1]), close - nLoss), iff(close < nz(xATRTrailingStop[1], 0) and close[1] < nz(xATRTrailingStop[1], 0), min(nz(xATRTrailingStop[1]), close + nLoss), iff(close > nz(xATRTrailingStop[1], 0), close - nLoss, close + nLoss)))
+pos =	iff(close[1] < nz(xATRTrailingStop[1], 0) and close > nz(xATRTrailingStop[1], 0), 1, iff(close[1] > nz(xATRTrailingStop[1], 0) and close < nz(xATRTrailingStop[1], 0), -1, nz(pos[1], 0))) 
+color = pos == -1 ? red: pos == 1 ? green : blue 
+plot(xATRTrailingStop, color=color, title="ATR Trailing Stop")
+
+
+//Bollinger Bands
+
+length = input(20, minval=1, group="BB")
+src = input(close, title="Source", group="BB")
+basis = sma(src, length)
+
+mult2 = input(2.0, minval=1, maxval=4, step=0.2, group="BB")
+dev2 = mult2 * stdev(src, length)
+upper2 = basis + dev2
+lower2 = basis - dev2
+
+mult3 = input(2.8, minval=1.6, maxval=6, step=0.2, group="BB")
+dev3 = mult3 * stdev(src, length)
+upper3 = basis + dev3
+lower3 = basis - dev3
+
+plot(basis, title="BB Base", color=red) //sma
+
+p2a = plot(upper2, title="BB2 upper", color=yellow)
+p2b = plot(lower2, title="BB2 lower", color=yellow)
+
+p3a = plot(upper3, title="BB3 upper", color=red)
+p3b = plot(lower3, title="BB3 lower", color=green)
+
+fill(p3a, p3b, color=white)  
