@@ -5,3 +5,4 @@
 ### Ref
 - https://www.tradingview.com/u/SamRecio/
 - https://www.tradingview.com/u/pmk07/
+- © tradeforopp
