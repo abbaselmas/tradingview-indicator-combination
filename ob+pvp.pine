@@ -695,51 +695,51 @@ if barstate.islast
         if i_isYearlyEnabled
             f_drawCompleteLine(_margin, yearlyOpen, yearlyTime, i_yearlyColor, i_yoStr)
         if i_isPYearlyEnabled
-            f_drawCompleteLine(_margin, pyearlyOpen, pyearlyTime, i_pyearlyColor, i_pyoStr)
+            f_drawCompleteLine(_margin+1, pyearlyOpen, pyearlyTime, i_pyearlyColor, i_pyoStr)
         if i_isYearlyHEnabled
             f_drawCompleteLine(_margin, yearlyHigh, yearlyTime, i_yearlyHColor, i_yhStr)
         if i_isPYearlyHEnabled
-            f_drawCompleteLine(_margin, pyearlyHigh, pyearlyTime, i_pyearlyHColor, i_pyhStr)
+            f_drawCompleteLine(_margin+1, pyearlyHigh, pyearlyTime, i_pyearlyHColor, i_pyhStr)
         if i_isYearlyLEnabled
             f_drawCompleteLine(_margin, yearlyLow, yearlyTime, i_yearlyLColor, i_ylStr)
         if i_isPYearlyLEnabled
-            f_drawCompleteLine(_margin, pyearlyLow, pyearlyTime, i_pyearlyLColor, i_pylStr)
+            f_drawCompleteLine(_margin+1, pyearlyLow, pyearlyTime, i_pyearlyLColor, i_pylStr)
 
     //
     // Monthly
     //
     if canShowMonthly
-        _margin = 1
+        _margin = 2
         if i_isMonthlyEnabled
             f_drawCompleteLine(_margin, monthlyOpen, monthlyTime, i_monthlyColor, i_moStr)
         if i_isPMonthlyEnabled
-            f_drawCompleteLine(_margin, pmonthlyOpen, pmonthlyTime, i_pmonthlyColor, i_pmoStr)
+            f_drawCompleteLine(_margin+1, pmonthlyOpen, pmonthlyTime, i_pmonthlyColor, i_pmoStr)
         if i_isMonthlyHEnabled
             f_drawCompleteLine(_margin, monthlyHigh, monthlyTime, i_monthlyHColor, i_mhStr)
         if i_isPMonthlyHEnabled
-            f_drawCompleteLine(_margin, pmonthlyHigh, pmonthlyTime, i_pmonthlyHColor, i_pmhStr)
+            f_drawCompleteLine(_margin+1, pmonthlyHigh, pmonthlyTime, i_pmonthlyHColor, i_pmhStr)
         if i_isMonthlyLEnabled
             f_drawCompleteLine(_margin, monthlyLow, monthlyTime, i_monthlyLColor, i_mlStr)
         if i_isPMonthlyLEnabled
-            f_drawCompleteLine(_margin, pmonthlyLow, pmonthlyTime, i_pmonthlyLColor, i_pmlStr)
+            f_drawCompleteLine(_margin+1, pmonthlyLow, pmonthlyTime, i_pmonthlyLColor, i_pmlStr)
 
     //
     // Weekly
     //
     if canShowWeekly
-        _margin = 2
+        _margin = 4
         if i_isWeeklyEnabled
             f_drawCompleteLine(_margin, weeklyOpen, weeklyTime, i_weeklyColor, i_woStr)
         if i_isPWeeklyEnabled
-            f_drawCompleteLine(_margin, pweeklyOpen, pweeklyTime, i_pweeklyColor, i_pwoStr)
+            f_drawCompleteLine(_margin+1, pweeklyOpen, pweeklyTime, i_pweeklyColor, i_pwoStr)
         if i_isWeeklyHEnabled
             f_drawCompleteLine(_margin, weeklyHigh, weeklyTime, i_weeklyHColor, i_whStr)
         if i_isPWeeklyHEnabled
-            f_drawCompleteLine(_margin, pweeklyHigh, pweeklyTime, i_pweeklyHColor, i_pwhStr)
+            f_drawCompleteLine(_margin+1, pweeklyHigh, pweeklyTime, i_pweeklyHColor, i_pwhStr)
         if i_isWeeklyLEnabled
             f_drawCompleteLine(_margin, weeklyLow, weeklyTime, i_weeklyLColor, i_wlStr)
         if i_isPWeeklyLEnabled
-            f_drawCompleteLine(_margin, pweeklyLow, pweeklyTime, i_pweeklyLColor, i_pwlStr)
+            f_drawCompleteLine(_margin+1, pweeklyLow, pweeklyTime, i_pweeklyLColor, i_pwlStr)
         if i_isMondayLowEnabled
             f_drawCompleteLine(_margin+1, mondayLow, mondayTime, i_mondayLowColor, i_monlStr)
         if i_isMondayHighEnabled
@@ -749,16 +749,16 @@ if barstate.islast
     // Daily
     //
     if canShowDaily
-        _margin = 3
+        _margin = 6
         if i_isDailyEnabled
             f_drawCompleteLine(_margin, dailyOpen, dailyTime, i_dailyColor, i_doStr)
         if i_isPDailyEnabled
-            f_drawCompleteLine(_margin, pdailyOpen,pdailyTime, i_pdailyColor, i_pdoStr)
+            f_drawCompleteLine(_margin+1, pdailyOpen,pdailyTime, i_pdailyColor, i_pdoStr)
         if i_isDailyHEnabled
             f_drawCompleteLine(_margin, dailyHigh, dailyTime, i_dailyHColor, i_dhStr)
         if i_isPDailyHEnabled
-            f_drawCompleteLine(_margin, pdailyHigh, pdailyTime, i_pdailyHColor, i_pdhStr)
+            f_drawCompleteLine(_margin+1, pdailyHigh, pdailyTime, i_pdailyHColor, i_pdhStr)
         if i_isDailyLEnabled
             f_drawCompleteLine(_margin, dailyLow, dailyTime, i_dailyLColor, i_dlStr)
         if i_isPDailyLEnabled
-            f_drawCompleteLine(_margin, pdailyLow, pdailyTime, i_pdailyLColor, i_pdlStr)
+            f_drawCompleteLine(_margin+1, pdailyLow, pdailyTime, i_pdailyLColor, i_pdlStr)
