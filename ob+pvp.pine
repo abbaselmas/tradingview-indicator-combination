@@ -2,8 +2,9 @@
 //https://www.tradingview.com/v/zSDlR0YP/
 //https://www.tradingview.com/v/WWqoUu7e/
 // © meliksah55
+//@Shanxia
 //@version=5
-indicator(title='OB+PVP+Weeknd+Opens', overlay=true, max_lines_count = 500, max_boxes_count = 500, max_bars_back = 5000)
+indicator(title='OB+PVP+Weeknd+Opens+NYO', overlay=true, max_lines_count = 500, max_boxes_count = 500, max_bars_back = 5000)
 
 bool        pv2_sv          = input.bool        (false,                          title='Plot 2nd order pivots')
 bool        msb_sv          = input.bool        (true,                           title='Plot MSB lines')
@@ -762,3 +763,50 @@ if barstate.islast
             f_drawCompleteLine(_margin, dailyLow, dailyTime, i_dailyLColor, i_dlStr)
         if i_isPDailyLEnabled
             f_drawCompleteLine(_margin+1, pdailyLow, pdailyTime, i_pdailyLColor, i_pdlStr)
+
+// INPUTS
+i_time              = input.session     ('0000-0001:1234567', "New York", tooltip="Different exchanges will have difference time zones so change accordingly.")
+i_tz                = input             ("GMT-5", "Timezone")
+i_vline             = input.bool        (true, "VLine", inline="in3")
+i_vcol              = input.color       (#00b9d0, "", inline="in3")
+i_txtcol            = input.color       (#0098ff, "  Text color", inline="in3")
+i_vstyle            = input.string      ("Solid", "Style", options=["Solid", "Dotted", "Dashed"])
+
+
+i_hline             = input.bool        (true, "HLine", inline="in1")
+i_linecol           = input.color       (#0064ff, "", inline="in1")
+i_linestyle         = input.string      ("Dotted", " ", options=["Solid", "Dotted", "Dashed"], inline="in1")
+i_ex                = input.string      ("1 Day", "Extend", options=["1 Day", "2 Days", "Right", "Both"], inline="in4" )
+i_ex2               = input.bool        (false, "", inline="in4")
+i_ex3               = input.int         (3, "Hours", 1, 23, inline="in4")
+
+// MISC
+nymid               = time              ("1", i_time, i_tz)
+linestyle           = i_linestyle ==    "Solid" ? line.style_solid : i_linestyle == "Dotted" ? line.style_dotted : line.style_dashed
+vstyle              = i_vstyle    ==    "Solid" ? line.style_solid : i_vstyle == "Dotted" ? line.style_dotted : line.style_dashed
+ex                  = i_ex        ==    "1 Day" ? extend.none : i_ex == "2 Days" ? extend.none : i_ex == "Right" ? extend.right : extend.both  
+htime               = i_ex        ==    "2 Days" ? 172800000 : 86400000
+hourtime            = i_ex2 ? i_ex3 * 3600000 : htime
+// CALC
+var openprice       = 0.0
+_open = request.security(syminfo.tickerid, "60", open)
+if nymid
+    if not nymid[1]
+        openprice := _open
+    else
+        openprice := math.max(_open, openprice)
+
+// OBJECTS
+var label lb = na
+if openprice != openprice[1] and i_hline
+    var line lne = na
+    line.set_x2(lne, nymid)
+    line.set_extend(lne, extend.none)
+    lne := line.new(nymid, openprice, nymid + hourtime , openprice, xloc.bar_time, extend.none, i_linecol, linestyle, 2)
+    lb  := label.new(nymid + htime, openprice, "NY Midnight Open | " + str.tostring(math.round_to_mintick(openprice)), xloc.bar_time, yloc.price, na, label.style_none, i_txtcol)
+    label.delete(lb[1])
+
+if i_vline
+    line.new(nymid, high, nymid, low, xloc.bar_time, extend.both, i_vcol, vstyle, 1)
+
+// END
