@@ -8,3 +8,4 @@
 - https://www.tradingview.com/u/pmk07/
 - © tradeforopp
 - https://www.tradingview.com/v/CnB3fSph/ LuxAlgo
+- © ALPHAICTRADER

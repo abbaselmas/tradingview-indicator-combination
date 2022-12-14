@@ -2,7 +2,9 @@
 //https://www.tradingview.com/v/zSDlR0YP/
 //https://www.tradingview.com/v/WWqoUu7e/
 // © meliksah55
-//@Shanxia
+// @Shanxia
+// ©ALPHAICTRADER
+
 //@version=5
 indicator(title='OB+PVP+Weeknd+Opens+NYO', overlay=true, max_lines_count = 500, max_boxes_count = 500, max_bars_back = 5000)
 
@@ -764,49 +766,79 @@ if barstate.islast
         if i_isPDailyLEnabled
             f_drawCompleteLine(_margin+1, pdailyLow, pdailyTime, i_pdailyLColor, i_pdlStr)
 
-// INPUTS
-i_time              = input.session     ('0000-0001:1234567', "New York", tooltip="Different exchanges will have difference time zones so change accordingly.")
-i_tz                = input             ("GMT-5", "Timezone")
-i_vline             = input.bool        (true, "VLine", inline="in3")
-i_vcol              = input.color       (#00b9d0, "", inline="in3")
-i_txtcol            = input.color       (#0098ff, "  Text color", inline="in3")
-i_vstyle            = input.string      ("Solid", "Style", options=["Solid", "Dotted", "Dashed"])
+iMDisplay = input.bool    (true, "Display", group="New York Midnight Day Divider")
+iMDColor   = input.color   (#58A2B0, "Color", group="New York Midnight Day Divider")
+iMDStyle   = input.string  ("Solid", "Line Style", options=["Solid", "Dotted", "Dashed"], group="New York Midnight Day Divider")
+//iMDHistory = input.bool    (false, "History", group="New York Midnight Day Divider")
+
+iMTime    = input.session ('0500-0501:1234567', "Session", group="New York Midnight Open")
+iMStyle   = input.string  ("Dashed", "Line Style", options=["Solid", "Dotted", "Dashed"], group="New York Midnight Open")
+iMColor   = input.color   (#58A2B0, "Color", group="New York Midnight Open")
+iMHistory = input.bool    (true, "History", group="New York Midnight Open")
+iMLabel   = input.bool    (true, "Show Label", group="New York Midnight Open")
+
+i8Display = input.bool    (true, "Display", group="New York 8:30 Open")
+i8Time    = input.session ('1330-1331:1234567', "Session", group="New York 8:30 Open")
+i8Style   = input.string  ("Dotted", "Line Style", options=["Solid", "Dotted", "Dashed"], group="New York 8:30 Open")
+i8Color   = input.color   (#58A2B0, "Color", group="New York 8:30 Open")
+i8History = input.bool    (true, "History", group="New York 8:30 Open")
+i8Label   = input.bool    (true, "Show Label", group="New York 8:30 Open")
+
+tMidnight = time          ("1", iMTime)
+t830      = time          ("1", i8Time)
+
+_MStyle   = iMStyle ==    "Solid" ? line.style_solid : iMStyle == "Dotted" ? line.style_dotted : line.style_dashed
+_8Style   = i8Style ==    "Solid" ? line.style_solid : i8Style == "Dotted" ? line.style_dotted : line.style_dashed
+_DStyle   = iMDStyle ==   "Solid" ? line.style_solid : iMDStyle == "Dotted" ? line.style_dotted : line.style_dashed
 
 
-i_hline             = input.bool        (true, "HLine", inline="in1")
-i_linecol           = input.color       (#0064ff, "", inline="in1")
-i_linestyle         = input.string      ("Dotted", " ", options=["Solid", "Dotted", "Dashed"], inline="in1")
-i_ex                = input.string      ("1 Day", "Extend", options=["1 Day", "2 Days", "Right", "Both"], inline="in4" )
-i_ex2               = input.bool        (false, "", inline="in4")
-i_ex3               = input.int         (3, "Hours", 1, 23, inline="in4")
+//==== Midnight Open ====
+if iMDisplay
+    var line dayLine = na
+    dayLine :=line.new(tMidnight, high, tMidnight, low, xloc.bar_time, extend.both, iMDColor, _DStyle, 1)
+    //if not iMDHistory
+       //line.delete(dayLine[1])
 
-// MISC
-nymid               = time              ("1", i_time, i_tz)
-linestyle           = i_linestyle ==    "Solid" ? line.style_solid : i_linestyle == "Dotted" ? line.style_dotted : line.style_dashed
-vstyle              = i_vstyle    ==    "Solid" ? line.style_solid : i_vstyle == "Dotted" ? line.style_dotted : line.style_dashed
-ex                  = i_ex        ==    "1 Day" ? extend.none : i_ex == "2 Days" ? extend.none : i_ex == "Right" ? extend.right : extend.both  
-htime               = i_ex        ==    "2 Days" ? 172800000 : 86400000
-hourtime            = i_ex2 ? i_ex3 * 3600000 : htime
-// CALC
-var openprice       = 0.0
-_open = request.security(syminfo.tickerid, "60", open)
-if nymid
-    if not nymid[1]
-        openprice := _open
-    else
-        openprice := math.max(_open, openprice)
+if iMDisplay
+    var openMidnight  = 0.0
+    if tMidnight
+        if not tMidnight[1]
+            openMidnight  := open
+        else
+            openMidnight := math.max(open, openMidnight)
 
-// OBJECTS
-var label lb = na
-if openprice != openprice[1] and i_hline
+    var label lb = na
     var line lne = na
-    line.set_x2(lne, nymid)
-    line.set_extend(lne, extend.none)
-    lne := line.new(nymid, openprice, nymid + hourtime , openprice, xloc.bar_time, extend.none, i_linecol, linestyle, 2)
-    lb  := label.new(nymid + htime, openprice, "NY Midnight Open | " + str.tostring(math.round_to_mintick(openprice)), xloc.bar_time, yloc.price, na, label.style_none, i_txtcol)
-    label.delete(lb[1])
+    if openMidnight != openMidnight[1]
+        if barstate.isconfirmed
+            line.set_x2(lne, tMidnight)
+            lne := line.new(tMidnight, openMidnight, last_bar_time + 14400000/2, openMidnight, xloc.bar_time, extend.none, iMColor, _MStyle, 1)
+            if iMLabel
+                lb  := label.new(last_bar_time + 14400000/2, openMidnight, "Midnight", xloc.bar_time, yloc.price, na, label.style_none, iMColor, size.normal, text.align_right)
+            label.delete(lb[1])
+            if not iMHistory
+                line.delete(lne[1])
+//===========================
 
-if i_vline
-    line.new(nymid, high, nymid, low, xloc.bar_time, extend.both, i_vcol, vstyle, 1)
 
-// END
+//==== 8:30 Open ====
+if i8Display
+    var open830  = 0.0
+    if t830
+        if not t830[1]
+            open830  := open
+        else
+            open830 := math.max(open, open830)
+
+    var label lb2 = na
+    var line lne2 = na
+    if open830 != open830[1]
+        if barstate.isconfirmed
+            line.set_x2(lne2, t830 - 30600000)
+            lne2 := line.new(t830, open830, last_bar_time + 14400000/2, open830, xloc.bar_time, extend.none, i8Color, _8Style, 1)
+            if i8Label
+                lb2  := label.new(last_bar_time + 14400000/2, open830, "8:30", xloc.bar_time, yloc.price, na, label.style_none, i8Color, size.normal, text.align_right)
+            label.delete(lb2[1])
+            if not i8History
+                line.delete(lne2[1])
+//===========================
