@@ -1,15 +1,9 @@
-//Combined version of 
-//https://www.tradingview.com/v/zSDlR0YP/
-// © meliksah55
-// @Shanxia
-// ©ALPHAICTRADER
-
 //@version=5
-indicator(title='OB+Weeknd+Opens+NYO830', overlay=true, max_lines_count = 500, max_boxes_count = 500, max_bars_back = 5000)
+indicator(title='OB+PVP+Weeknd+Opens+NYO', overlay=true, max_lines_count = 500, max_boxes_count = 500, max_bars_back = 5000)
 
 bool        pv2_sv          = input.bool        (false,                          title='Plot 2nd order pivots')
-bool        msb_sv          = input.bool        (true,                           title='Plot MSB lines')
-bool        box_sv          = input.bool        (true,                           title='Plot Orderblocks')
+bool        msb_sv          = input.bool        (false,                           title='Plot MSB lines')
+bool        box_sv          = input.bool        (false,                           title='Plot Orderblocks')
 bool        m_sv            = input.bool        (false,                          title='Plot Breakerblocks')
 bool        range_sv        = input.bool        (true,                           title='Plot Range')
 bool        range_eq_sv     = input.bool        (true,                           title='Plot Range 0.5 Line')
@@ -81,8 +75,8 @@ string      alert           = na
 multiplier = input.float(2.6, minval=0, maxval=10, step=0.02, group = "Weekend")
 
 day_clr = dayofweek < 2 or dayofweek > 6 ? color.new(#9598a1, 75) : color.new(#9598a1, 100)
-//plot(((high / low) * ohlc4) * (1 + multiplier / 100), style=plot.style_areabr, color=day_clr)
-plot( ((low / high) * ohlc4) * (1 - multiplier / 100), style=plot.style_areabr, color=day_clr)
+plot(((high / low) * ohlc4) * (1 + multiplier / 100), style=plot.style_line, color=day_clr)
+plot( ((low / high) * ohlc4) * (1 - multiplier / 100), style=plot.style_line, color=day_clr)
 
 if barstate.isconfirmed
     if pvh
@@ -605,17 +599,17 @@ if barstate.islast
             f_drawCompleteLine(_margin+1, pdailyLow, pdailyTime, i_pdailyLColor, i_pdlStr)
 
 iMDisplay = input.bool    (true, "Display", group="New York Midnight Open")
-iMTime    = input.session ('0500-0501:1234567', "Session", group="New York Midnight Open")
+iMTime    = input.session ('0700-0730:1234567', "Session", group="New York Midnight Open")
 iMStyle   = input.string  ("Dashed", "Line Style", options=["Solid", "Dotted", "Dashed"], group="New York Midnight Open")
 iMColor   = input.color   (#58A2B0, "Color", group="New York Midnight Open")
-iMHistory = input.bool    (true, "History", group="New York Midnight Open")
+iMHistory = input.bool    (false, "History", group="New York Midnight Open")
 iMLabel   = input.bool    (true, "Show Label", group="New York Midnight Open")
 
 i8Display = input.bool    (true, "Display", group="New York 8:30 Open")
-i8Time    = input.session ('1330-1331:1234567', "Session", group="New York 8:30 Open")
+i8Time    = input.session ('1530-1600:1234567', "Session", group="New York 8:30 Open")
 i8Style   = input.string  ("Dotted", "Line Style", options=["Solid", "Dotted", "Dashed"], group="New York 8:30 Open")
 i8Color   = input.color   (#58A2B0, "Color", group="New York 8:30 Open")
-i8History = input.bool    (true, "History", group="New York 8:30 Open")
+i8History = input.bool    (false, "History", group="New York 8:30 Open")
 i8Label   = input.bool    (true, "Show Label", group="New York 8:30 Open")
 
 tMidnight = time          ("1", iMTime)
