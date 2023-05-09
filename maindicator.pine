@@ -1,5 +1,5 @@
 //@version=5
-indicator(title='OB+PVP+Weeknd+Opens+NYO', overlay=true, max_lines_count = 500, max_boxes_count = 500, max_bars_back = 5000)
+indicator(title='OB+PVP+Weeknd+Opens+NYO', overlay=true)
 
 bool        pv2_sv          = input.bool        (false,                          title='Plot 2nd order pivots')
 bool        msb_sv          = input.bool        (false,                           title='Plot MSB lines')
@@ -72,11 +72,11 @@ bool        new_ph_2nd      = false
 bool        new_pl_2nd      = false
 string      alert           = na
 
-multiplier = input.float(2.6, minval=0, maxval=10, step=0.02, group = "Weekend")
+multiplier = input.float(3, minval=0, maxval=10, step=0.1, group = "Weekend")
 
-day_clr = dayofweek < 2 or dayofweek > 6 ? color.new(#9598a1, 75) : color.new(#9598a1, 100)
+day_clr = dayofweek < 2 or dayofweek > 6 ? color.new(#9598a1, 55) : color.new(#9598a1, 100)
 plot(((high / low) * ohlc4) * (1 + multiplier / 100), style=plot.style_line, color=day_clr)
-plot( ((low / high) * ohlc4) * (1 - multiplier / 100), style=plot.style_line, color=day_clr)
+plot(((low / high) * ohlc4) * (1 - multiplier / 100), style=plot.style_line, color=day_clr)
 
 if barstate.isconfirmed
     if pvh
@@ -290,7 +290,7 @@ var DEFAULT_LABEL_STYLE = label.style_none
 
 //------------------------------ Inputs -------------------------------
 
-var i_isDailyEnabled = input.bool(defval=true, title='Daily', group='Current Opens', inline='Daily')
+var i_isDailyEnabled = input.bool(defval=false, title='Daily', group='Current Opens', inline='Daily')
 var i_dailyColor = input.color(defval=color.green, title='', group='Current Opens', inline='Daily')
 var i_isWeeklyEnabled = input.bool(defval=true, title='Weekly', group='Current Opens', inline='Weekly')
 var i_weeklyColor = input.color(defval=color.orange, title='', group='Current Opens', inline='Weekly')
@@ -299,7 +299,7 @@ var i_monthlyColor = input.color(defval=color.red, title='', group='Current Open
 var i_isYearlyEnabled = input.bool(defval=false, title='Yearly', group='Current Opens', inline='Yearly')
 var i_yearlyColor = input.color(defval=color.blue, title='', group='Current Opens', inline='Yearly')
 
-var i_isPDailyEnabled = input.bool(defval=true, title='Daily', group='Previous Opens', inline='Daily')
+var i_isPDailyEnabled = input.bool(defval=false, title='Daily', group='Previous Opens', inline='Daily')
 var i_pdailyColor = input.color(defval=color.green, title='', group='Previous Opens', inline='Daily')
 var i_isPWeeklyEnabled = input.bool(defval=true, title='Weekly', group='Previous Opens', inline='Weekly')
 var i_pweeklyColor = input.color(defval=color.orange, title='', group='Previous Opens', inline='Weekly')
@@ -312,17 +312,17 @@ var i_isMondayHighEnabled = input.bool(defval=true, title='Monday High', group='
 var i_mondayHighColor = input.color(defval=color.lime, title='', group='Current High/Low', inline='Monday High')
 var i_isMondayLowEnabled = input.bool(defval=true, title='MondayLow', group='Current High/Low', inline='Monday Low')
 var i_mondayLowColor = input.color(defval=color.lime, title='', group='Current High/Low', inline='Monday Low')
-var i_isDailyHEnabled = input.bool(defval=true, title='Daily High', group='Current High/Low', inline='Daily High')
+var i_isDailyHEnabled = input.bool(defval=false, title='Daily High', group='Current High/Low', inline='Daily High')
 var i_dailyHColor = input.color(defval=color.green, title='', group='Current High/Low', inline='Daily High')
-var i_isDailyLEnabled = input.bool(defval=true, title='Daily Low', group='Current High/Low', inline='Daily Low')
+var i_isDailyLEnabled = input.bool(defval=false, title='Daily Low', group='Current High/Low', inline='Daily Low')
 var i_dailyLColor = input.color(defval=color.green, title='', group='Current High/Low', inline='Daily Low')
-var i_isWeeklyHEnabled = input.bool(defval=true, title='Weekly High', group='Current High/Low', inline='Weekly High')
+var i_isWeeklyHEnabled = input.bool(defval=false, title='Weekly High', group='Current High/Low', inline='Weekly High')
 var i_weeklyHColor = input.color(defval=color.orange, title='', group='Current High/Low', inline='Weekly High')
-var i_isWeeklyLEnabled = input.bool(defval=true, title='Weekly Low', group='Current High/Low', inline='Weekly Low')
+var i_isWeeklyLEnabled = input.bool(defval=false, title='Weekly Low', group='Current High/Low', inline='Weekly Low')
 var i_weeklyLColor = input.color(defval=color.orange, title='', group='Current High/Low', inline='Weekly Low')
-var i_isMonthlyHEnabled = input.bool(defval=true, title='Monthly High', group='Current High/Low', inline='Monthly High')
+var i_isMonthlyHEnabled = input.bool(defval=false, title='Monthly High', group='Current High/Low', inline='Monthly High')
 var i_monthlyHColor = input.color(defval=color.red, title='', group='Current High/Low', inline='Monthly High')
-var i_isMonthlyLEnabled = input.bool(defval=true, title='Monthly Low', group='Current High/Low', inline='Monthly Low')
+var i_isMonthlyLEnabled = input.bool(defval=false, title='Monthly Low', group='Current High/Low', inline='Monthly Low')
 var i_monthlyLColor = input.color(defval=color.red, title='', group='Current High/Low', inline='Monthly Low')
 var i_isYearlyHEnabled = input.bool(defval=false, title='Yearly High', group='Current High/Low', inline='Yearly High')
 var i_yearlyHColor = input.color(defval=color.orange, title='', group='Current High/Low', inline='Yearly High')
@@ -333,13 +333,13 @@ var i_isPDailyHEnabled = input.bool(defval=false, title='Daily High', group='Pre
 var i_pdailyHColor = input.color(defval=color.green, title='', group='Previous High/Low', inline='Daily High')
 var i_isPDailyLEnabled = input.bool(defval=false, title='Daily Low', group='Previous High/Low', inline='Daily Low')
 var i_pdailyLColor = input.color(defval=color.green, title='', group='Previous High/Low', inline='Daily Low')
-var i_isPWeeklyHEnabled = input.bool(defval=true, title='Weekly High', group='Previous High/Low', inline='Weekly High')
+var i_isPWeeklyHEnabled = input.bool(defval=false, title='Weekly High', group='Previous High/Low', inline='Weekly High')
 var i_pweeklyHColor = input.color(defval=color.orange, title='', group='Previous High/Low', inline='Weekly High')
-var i_isPWeeklyLEnabled = input.bool(defval=true, title='Weekly Low', group='Previous High/Low', inline='Weekly Low')
+var i_isPWeeklyLEnabled = input.bool(defval=false, title='Weekly Low', group='Previous High/Low', inline='Weekly Low')
 var i_pweeklyLColor = input.color(defval=color.orange, title='', group='Previous High/Low', inline='Weekly Low')
-var i_isPMonthlyHEnabled = input.bool(defval=true, title='Monthly High', group='Previous High/Low', inline='Monthly High')
+var i_isPMonthlyHEnabled = input.bool(defval=false, title='Monthly High', group='Previous High/Low', inline='Monthly High')
 var i_pmonthlyHColor = input.color(defval=color.red, title='', group='Previous High/Low', inline='Monthly High')
-var i_isPMonthlyLEnabled = input.bool(defval=true, title='Monthly Low', group='Previous High/Low', inline='Monthly Low')
+var i_isPMonthlyLEnabled = input.bool(defval=false, title='Monthly Low', group='Previous High/Low', inline='Monthly Low')
 var i_pmonthlyLColor = input.color(defval=color.red, title='', group='Previous High/Low', inline='Monthly Low')
 var i_isPYearlyHEnabled = input.bool(defval=false, title='Yearly High', group='Previous High/Low', inline='Yearly High')
 var i_pyearlyHColor = input.color(defval=color.orange, title='', group='Previous High/Low', inline='Yearly High')
@@ -347,7 +347,7 @@ var i_isPYearlyLEnabled = input.bool(defval=false, title='Yearly Low', group='Pr
 var i_pyearlyLColor = input.color(defval=color.orange, title='', group='Previous High/Low', inline='Yearly Low')
 
 var i_isTailsEnabled = input.bool(defval=true, title='Show Tails', group='Settings')
-var i_projectionOffset = input.int(defval=5, title='Offset', group='Settings', minval=1)
+var i_projectionOffset = input.int(defval=1, title='Offset', group='Settings')
 
 var i_doStr = input.string(defval="DO", title="Daily Opening Label", group="Label Captions")
 var i_woStr = input.string(defval="WO", title="Weekly Opening Label", group="Label Captions")
