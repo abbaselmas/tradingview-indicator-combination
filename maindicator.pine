@@ -599,14 +599,14 @@ if barstate.islast
             f_drawCompleteLine(_margin+1, pdailyLow, pdailyTime, i_pdailyLColor, i_pdlStr)
 
 iMDisplay = input.bool    (true, "Display", group="New York Midnight Open")
-iMTime    = input.session ('0700-0730:1234567', "Session", group="New York Midnight Open")
+iMTime    = input.session ('0400-0405:1234567', "Session", group="New York Midnight Open")
 iMStyle   = input.string  ("Dashed", "Line Style", options=["Solid", "Dotted", "Dashed"], group="New York Midnight Open")
 iMColor   = input.color   (#58A2B0, "Color", group="New York Midnight Open")
 iMHistory = input.bool    (false, "History", group="New York Midnight Open")
 iMLabel   = input.bool    (true, "Show Label", group="New York Midnight Open")
 
 i8Display = input.bool    (true, "Display", group="New York 8:30 Open")
-i8Time    = input.session ('1530-1600:1234567', "Session", group="New York 8:30 Open")
+i8Time    = input.session ('1230-1235:1234567', "Session", group="New York 8:30 Open")
 i8Style   = input.string  ("Dotted", "Line Style", options=["Solid", "Dotted", "Dashed"], group="New York 8:30 Open")
 i8Color   = input.color   (#58A2B0, "Color", group="New York 8:30 Open")
 i8History = input.bool    (false, "History", group="New York 8:30 Open")
