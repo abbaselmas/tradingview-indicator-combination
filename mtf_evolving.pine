@@ -1,0 +1,376 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © DarkWaveAlgo
+// @version=5
+// This script was inspired by @sourcey's Value Area POC/VAH/VAL script: https://www.tradingview.com/script/eig8zJgR-Value-Area-POC-VAH-VAL/ and uses a vartiation of @sourcey's Value area calculation function
+//
+//
+//
+//                                                                    ░█▀▄▒▄▀▄▒█▀▄░█▄▀░█░░▒█▒▄▀▄░█▒█▒██▀▒▄▀▄░█▒░░▄▀▒░▄▀▄
+//                                                                    ▒█▄▀░█▀█░█▀▄░█▒█░▀▄▀▄▀░█▀█░▀▄▀░█▄▄░█▀█▒█▄▄░▀▄█░▀▄▀
+//
+//
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+indicator(title="MTF Evolving Weighted Composite Value Area", shorttitle = "MTF Evolving Weighted Composite VA", overlay=true, max_lines_count=500, max_labels_count=500, max_boxes_count=500)
+import DarkWaveAlgo/DarkWaveColorThemes/1 as ColorThemes
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//                                                                           ▒█▀░█▒█░█▄░█░▄▀▀░▀█▀░█░▄▀▄░█▄░█░▄▀▀
+//                                                                           ░█▀░▀▄█░█▒▀█░▀▄▄░▒█▒░█░▀▄▀░█▒▀█▒▄██
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+f_MA(maType, source, period) =>
+    ma = switch(maType)
+        "Simple" => ta.sma(source,period)
+        "Exponential" => ta.ema(source,period)
+        "Weighted" => ta.wma(source,period)
+        "Hull" => ta.hma(source,period)
+        "Volume-Weighted" => ta.vwma(source,period)
+
+f_GetMATypeShortName(maType) =>
+    shortName = switch(maType)
+        "Simple" => "SMA"
+        "Exponential" => "EMA"
+        "Weighted" => "WMA"
+        "Hull" => "HMA"
+        "Volume-Weighted" => "VWMA"    
+
+getStyle(styleString) =>
+    t = styleString == "Solid" ? line.style_solid : styleString == "Arrow" ? line.style_arrow_right : styleString == "Dotted" ? line.style_dotted : styleString == "Dashed" ? line.style_dashed : na
+
+getBool(booleanString) =>
+    t = booleanString == "Yes" ? true : false
+
+getSize(sizeString) =>
+    t = sizeString == "Auto" ? size.auto : sizeString == "Tiny" ? size.tiny : sizeString == "Small" ? size.small : sizeString == "Normal" ? size.normal : sizeString == "Large" ? size.large : sizeString == "Huge" ? size.huge : na
+
+_tfString(tf) =>
+    str = "Chart"
+    if (str.contains(tf, "H") or  (str.contains(tf, "S")) or (str.contains(tf, "D")) or (str.contains(tf, "W")) or (str.contains(tf, "M")))
+        str := tf
+    else if (not na(str.tonumber(tf)))
+        str := tf == '180' ? "3h" : tf == '240' ? "4h" : tf == '480' ? "8h" : tf == '120' ? "2h" : tf == '60' ? "1h" : tf + "m"
+
+tfString(tf) =>
+    str = "Chart"
+    if (str.contains(tf, "H") or  (str.contains(tf, "S")) or (str.contains(tf, "D")) or (str.contains(tf, "W")) or (str.contains(tf, "M")))
+        str := tf
+    else if (not na(str.tonumber(tf)))
+        str := tf == '180' ? "3h" : tf == '240' ? "4h" : tf == '480' ? "8h" : tf == '120' ? "2h" : tf == '60' ? "1h" : tf + "m"
+    else 
+        str := _tfString(timeframe.period)
+
+f_is_new_bar(t) =>
+  
+      ta.change(time(t)) != 0
+
+agnostic_round(v, x) =>
+    math.round(v / x) * x
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//                                                          ░▄▀▒░█▒░░▄▀▄░██▄▒▄▀▄░█▒░░░░▄▀▀▒██▀░▀█▀░▀█▀░█░█▄░█░▄▀▒░▄▀▀
+//                                                          ░▀▄█▒█▄▄░▀▄▀▒█▄█░█▀█▒█▄▄▒░▒▄██░█▄▄░▒█▒░▒█▒░█░█▒▀█░▀▄█▒▄██
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Resolution = input.float(1, title="🔎 Calculation Decimal Resolution", group="🌊 Global Value Area Calculation Settings 🌊", step = 0.01, tooltip="This setting essentially determines how 'granular' the value area calculating process is. This value should be set to some multiple of the tick size/smallest decimal of the symbol's price chart. Eg. On BTCUSDT, the tick size/decimal is usually 0.1. So, you might use 0.5. On TSLA, the tick size is 0.01. You might use 0.05 or 0.25. Beware: if the resolution is too small, calculation will take too long and the script may timeout.")
+ShowMeSuggestedResolutions = input.bool(false, "🤔 Show Me Suggested Resolutions", group="🌊 Global Value Area Calculation Settings 🌊", tooltip="If enabled, a label will display in the bottom right of the chart with some suggested resolutions for the current chart.")
+_VAPercent = input.float(68, title = "⚙️ Area Percentage", group = "🌊 Global Value Area Calculation Settings 🌊", tooltip="Set the displayed percentage of the calculated value area. Igor method = 70%; Daniel method: 68%.")
+VAPercent = _VAPercent / 100.0
+
+useCustomColorTheme = input.bool(true, "✔️ Use a Color Theme", group="🌊 Global Styling Settings 🌊")
+selectedColorTheme = input.string("DarkWave Crypto", "  🎨 Color Theme", options=['DarkWave', 'Synthwave', 'DarkWave Crypto', 'Crystal Pool', 'Aquafarer', 'Mystic Armor', 
+  'Futurist', 'Electric Zest', 'Stealth Ride', 'Long Trader', 'Short Trader', 'Emerald Glow', 'Gold Heist', 'Floral', 'Cobalt Twilight', 'Sunrise'], group="🌊 Global Styling Settings 🌊")
+
+color _resistanceColor1 = input.color(#00d5bfff, "  🖌️ Resistance Color", group="🌊 Global Styling Settings 🌊")
+color _supportColor1= input.color(#c2185bff, "  🖌️ Support Color", group="🌊 Global Styling Settings 🌊")
+
+color supportColor1 = color(na)
+color resistanceColor1 = color(na)
+
+if (useCustomColorTheme)
+    supportColor1 := ColorThemes.getThemeColor(selectedColorTheme, 'Bullish')
+    resistanceColor1 := ColorThemes.getThemeColor(selectedColorTheme, 'Bearish')
+else
+    supportColor1 := _supportColor1
+    resistanceColor1 := _resistanceColor1
+
+PeriodRollovers_LabelEnabled = input.bool(false, "✔️ Show Period Rollover Labels", group="🌊 Global Styling Settings 🌊")
+PeriodRollovers_LabelSize = input.string("Small", "  📐 Size", options=["Auto", "Tiny", "Small", "Normal", "Large", "Huge"], group="🌊 Global Styling Settings 🌊")
+PeriodRollovers_ShowLabelLine = input.bool(false, "✔️ Show Period Rollover Lines", group="🌊 Global Styling Settings 🌊")
+
+FillCompositeValueArea = input.bool(true, "🧺 Fill Composite Value Area", group="🌊 Composite Value Area 🌊")
+Smooth = input.bool(true, "〰️ Smooth", group="🌊 Composite Value Area 🌊")
+Smoothing_Period = input.int(14, "    🔎 Smoothing Period", group="🌊 Composite Value Area 🌊")
+Smoothing_Method = input.string("Weighted", "    🌀 Smoothing Type", options=["Weighted", "Exponential", "Volume-Weighted", "Simple", "Hull"], group = "🌊 Composite Value Area 🌊")
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//                                                          ░▀█▀░█░█▄▒▄█▒██▀▒█▀▒█▀▄▒▄▀▄░█▄▒▄█▒██▀░░░▄█
+//                                                          ░▒█▒░█░█▒▀▒█░█▄▄░█▀░█▀▄░█▀█░█▒▀▒█░█▄▄▒░░░█
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Enable_VA_1 = input.bool(true, "✔️ Enable", group="🌊 Timeframe 1 🌊")
+Timeframe_1 = input.timeframe("240", "  🥽 Timeframe", group="🌊 Timeframe 1 🌊")
+Weighting_1 = input.float(20.0, "  ⚖️ Weighting %", minval = 0.0, maxval = 100.0, step = 0.01, group = "🌊 Timeframe 1 🌊", tooltip = "Set the weighting percentage or 'importance' of this timeframe's Value area in calculating the composite value area. Beware! The sum of the weighting percentages across all enabled timeframes must ALWAYS add up to 100 in order for this indicator to work as designed.")
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//                                                          ░▀█▀░█░█▄▒▄█▒██▀▒█▀▒█▀▄▒▄▀▄░█▄▒▄█▒██▀░░░▀█
+//                                                          ░▒█▒░█░█▒▀▒█░█▄▄░█▀░█▀▄░█▀█░█▒▀▒█░█▄▄▒░░█▄
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Enable_VA_2 = input.bool(true, "✔️ Enable", group="🌊 Timeframe 2 🌊")
+Timeframe_2 = input.timeframe("1D", "  🥽 Timeframe", group="🌊 Timeframe 2 🌊")
+Weighting_2 = input.float(30.0, "  ⚖️ Weighting %", minval = 0.0, maxval = 100.0, step = 0.01, group = "🌊 Timeframe 2 🌊", tooltip = "Set the weighting percentage or 'importance' of this timeframe's Value area in calculating the composite value area. Beware! The sum of the weighting percentages across all enabled timeframes must ALWAYS add up to 100 in order for this indicator to work as designed.")
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//                                                          ░▀█▀░█░█▄▒▄█▒██▀▒█▀▒█▀▄▒▄▀▄░█▄▒▄█▒██▀░░░▀██
+//                                                          ░▒█▒░█░█▒▀▒█░█▄▄░█▀░█▀▄░█▀█░█▒▀▒█░█▄▄▒░░▄▄█
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Enable_VA_3 = input.bool(true, "✔️ Enable", group="🌊 Timeframe 3 🌊")
+Timeframe_3 = input.timeframe("1W", "  🥽 Timeframe", group="🌊 Timeframe 3 🌊")
+Weighting_3 = input.float(50.0, "  ⚖️ Weighting %", minval = 0.0, maxval = 100.0, step = 0.01, group = "🌊 Timeframe 3 🌊", tooltip = "Set the weighting percentage or 'importance' of this timeframe's Value area in calculating the composite value area. Beware! The sum of the weighting percentages across all enabled timeframes must ALWAYS add up to 100 in order for this indicator to work as designed.")
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//                                                          
+//                                                   ░█▒█▒▄▀▄░░░▄▀▀▒▄▀▄░█▒░░▄▀▀░█▒█░█▒░▒▄▀▄░▀█▀░█░▄▀▄░█▄░█░▄▀▀
+//                                                   ░▀▄▀░█▀█▒░░▀▄▄░█▀█▒█▄▄░▀▄▄░▀▄█▒█▄▄░█▀█░▒█▒░█░▀▄▀░█▒▀█▒▄██
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+f_sourceyTimeValueArea(tf) =>
+    var a = array.new_float(0)
+    var cellCountArray = array.new_int(0)
+   
+    tick_size = math.max(syminfo.mintick, Resolution)
+    Area_min = 0.0, Area_min := nz(Area_min[1], agnostic_round(low, tick_size))
+    Area_max = 0.0, Area_max := nz(Area_max[1], agnostic_round(high, tick_size))
+    poc_shift = false
+    newTFBar = f_is_new_bar(tf)
+    if true
+        if newTFBar
+            Area_min := low
+            Area_max := high
+            array.clear(a)
+        
+        // Scaled min max
+        v_min = int(agnostic_round(low - Area_min, tick_size) / tick_size)
+        v_max = int(agnostic_round(high - Area_min, tick_size) / tick_size)
+        
+        // Scaled candle range
+        ticks = v_max - v_min
+        vol = volume / (ticks == 0 ? 1 : ticks)
+        for i = v_min to math.max(v_max - 1, v_min)
+            
+            // Insert new low value
+            if i < 0
+                array.insert(a, i - v_min, vol)
+                continue
+            
+            // Adjust index
+            offset = v_min < 0 ? math.abs(v_min) : 0
+            index = int(i + offset)
+            
+            // Push new high value
+            if index >= array.size(a)
+                array.push(a, vol)
+                continue
+            
+            // Update existing value
+            v = array.get(a, index)
+            array.set(a, index, v + vol)
+        
+        // Array bounds
+        Area_min := math.min(Area_min, agnostic_round(low, tick_size))
+        Area_max := math.max(Area_max, agnostic_round(high, tick_size))
+        Area_size = array.size(a)
+        
+        poc_index = -1
+        poc_prev = -1.0
+        sum_vol = 0.0
+        
+        for i = 0 to Area_size - 1
+            poc_current = array.get(a, i)
+            sum_vol := sum_vol + poc_current
+            
+            if poc_current > poc_prev
+                poc_prev := poc_current
+                poc_index := i
+                poc_shift := true
+        
+        vArea_high_index = poc_index
+        vArea_low_index  = poc_index
+            
+        vArea_vol_cap = sum_vol * VAPercent
+        sum_vArea_vol = array.get(a, poc_index)
+        
+        for i = 1 to Area_size - 1
+            above = 0.0
+            if vArea_high_index + 1 < Area_size - 1
+                above := above + nz(array.get(a, (vArea_high_index + 1)), 0.0)
+            if vArea_high_index + 2 < Area_size - 1
+                above := above + nz(array.get(a, (vArea_high_index + 2)), 0.0)
+                
+            below = 0.0
+            if vArea_low_index - 1 > 0
+                below := below + nz(array.get(a, (vArea_low_index - 1)), 0.0)
+            if vArea_low_index - 2 > 0
+                below := below + nz(array.get(a, (vArea_low_index - 2)), 0.0)
+            
+            if above > below
+                vArea_high_index := math.min(vArea_high_index + 2, Area_size - 1)
+                sum_vArea_vol  := sum_vArea_vol + above
+            else
+                vArea_low_index := math.max(vArea_low_index - 2, 0)
+                sum_vArea_vol := sum_vArea_vol + below
+                
+            if sum_vArea_vol >= vArea_vol_cap or (vArea_low_index <= 0 and vArea_high_index >= Area_size - 1)
+                break
+        
+        float poc = poc_index * tick_size + Area_min
+        float vArea_high = vArea_high_index * tick_size + Area_min
+        float vArea_low = vArea_low_index  * tick_size + Area_min
+        float pd_poc = 0.0
+        float prev_vArea_high = 0.0
+        float prev_vArea_low = 0.0
+        float prev_pd_poc = 0.0
+        
+        if newTFBar
+            pd_poc := poc[1]
+            prev_vArea_high := vArea_high[1]
+            prev_vArea_low := vArea_low[1]
+            prev_pd_poc := poc[1]
+        else
+            pd_poc := pd_poc[1]
+            prev_vArea_high := prev_vArea_high[1]
+            prev_vArea_low := prev_vArea_low[1]
+            prev_pd_poc := prev_pd_poc[1]
+
+        [poc, vArea_high, vArea_low]
+    else
+        [na, na, na]
+
+[ValueArea_POC_1, ValueArea_High_1, ValueArea_Low_1] = f_sourceyTimeValueArea(Timeframe_1)
+[ValueArea_POC_2, ValueArea_High_2, ValueArea_Low_2] = f_sourceyTimeValueArea(Timeframe_2)
+[ValueArea_POC_3, ValueArea_High_3, ValueArea_Low_3] = f_sourceyTimeValueArea(Timeframe_3)
+
+Weighting_Factor_1 = Weighting_1 / 100.0
+Weighting_Factor_2 = Weighting_2 / 100.0
+Weighting_Factor_3 = Weighting_3 / 100.0
+
+CompositeValueArea_High = ((Enable_VA_1 ? ValueArea_High_1 * Weighting_Factor_1 : 0) + (Enable_VA_2 ? ValueArea_High_2 * Weighting_Factor_2 : 0) + (Enable_VA_3 ? ValueArea_High_3 * Weighting_Factor_3 : 0))
+CompositeValueArea_Low = ((Enable_VA_1 ? ValueArea_Low_1 * Weighting_Factor_1 : 0) + (Enable_VA_2 ? ValueArea_Low_2 * Weighting_Factor_2 : 0) + (Enable_VA_3 ? ValueArea_Low_3 * Weighting_Factor_3 : 0))
+
+SmoothedCompositeValueArea_High = Smooth ? f_MA(Smoothing_Method, CompositeValueArea_High, Smoothing_Period) : CompositeValueArea_High
+SmoothedCompositeValueArea_Low = Smooth ? f_MA(Smoothing_Method, CompositeValueArea_Low, Smoothing_Period) : CompositeValueArea_Low
+CompositeValueArea_High_Plot = plot(SmoothedCompositeValueArea_High, color = resistanceColor1, title = "Composite Value Area High")
+CompositeValueArea_Low_Plot = plot(SmoothedCompositeValueArea_Low, color = supportColor1, title = "Composite Value Area Low")
+
+fill(CompositeValueArea_High_Plot, CompositeValueArea_Low_Plot, bottom_color = color.new(supportColor1, 75), top_color = color.new(resistanceColor1, 75), 
+  bottom_value = CompositeValueArea_Low, top_value = CompositeValueArea_High, display = FillCompositeValueArea ? display.all : display.none)
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  
+//  
+//                                                                  ░█▒░▒▄▀▄░██▄▒██▀░█▒░░▄▀▀
+//                                                                  ▒█▄▄░█▀█▒█▄█░█▄▄▒█▄▄▒▄██
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+var suggestedResolutions = table(na)
+if (ShowMeSuggestedResolutions and barstate.islast)
+    if (not na(suggestedResolutions))
+        table.delete(suggestedResolutions)
+    
+    lowDetail = syminfo.mintick * 20
+    midDetail = syminfo.mintick * 10
+    highDetail = syminfo.mintick * 1
+
+    row = 0
+    suggestedResolutions := table.new(position = position.bottom_right, columns = 2, rows = 4, bgcolor = color.new(resistanceColor1,60), border_width = 1, border_color = supportColor1, frame_color = resistanceColor1, frame_width = 2)
+
+    table.cell(suggestedResolutions, 0, row, "🌊 Suggested Resolutions 🌊", text_color=chart.fg_color, text_halign = text.align_center, text_size = size.normal)
+    table.merge_cells(suggestedResolutions,0,row,1,row)
+    
+    row += 1
+    table.cell(suggestedResolutions, 0, row, "Low Detail (Fast)" , text_color=chart.fg_color, text_halign = text.align_left, text_size = size.normal)
+    table.cell(suggestedResolutions, 1, row, str.tostring(lowDetail) , text_color=chart.fg_color, text_halign = text.align_left, text_size = size.normal)
+    
+    row += 1
+    table.cell(suggestedResolutions, 0, row, "Mid Detail" , text_color=chart.fg_color, text_halign = text.align_left, text_size = size.normal)
+    table.cell(suggestedResolutions, 1, row, str.tostring(midDetail) , text_color=chart.fg_color, text_halign = text.align_left, text_size = size.normal)
+    
+    row += 1
+    table.cell(suggestedResolutions, 0, row, "High Detail (Slow)" , text_color=chart.fg_color, text_halign = text.align_left, text_size = size.normal)
+    table.cell(suggestedResolutions, 1, row, str.tostring(highDetail) , text_color=chart.fg_color, text_halign = text.align_left, text_size = size.normal)
+
+// Prevent overlapping labels in order of expected lowest to highest TF
+TF1_TF3_Label_Overlap = ((Enable_VA_1 and f_is_new_bar(Timeframe_1)) and (Enable_VA_2 and f_is_new_bar(Timeframe_3)))
+if (f_is_new_bar(Timeframe_1) and not TF1_TF3_Label_Overlap and Enable_VA_1)
+    if (PeriodRollovers_ShowLabelLine)
+        line.new(x1 = bar_index, y1 = SmoothedCompositeValueArea_Low, x2 = bar_index, y2 = SmoothedCompositeValueArea_High, xloc = xloc.bar_index, color = color.new(chart.fg_color, 70), style = line.style_dashed, width = 1)
+    if (PeriodRollovers_LabelEnabled)
+        label.new(x = bar_index, y = SmoothedCompositeValueArea_Low, text = "New " + tfString(Timeframe_1), xloc = xloc.bar_index, yloc = yloc.price, color = color.new(supportColor1,70), textcolor = chart.fg_color, style = label.style_label_up, size = getSize(PeriodRollovers_LabelSize),
+          textalign = text.align_center)
+if (f_is_new_bar(Timeframe_2) and Enable_VA_2)
+    if (PeriodRollovers_ShowLabelLine)
+        line.new(x1 = bar_index, y1 = SmoothedCompositeValueArea_Low, x2 = bar_index, y2 = SmoothedCompositeValueArea_High, xloc = xloc.bar_index, color = color.new(chart.fg_color, 70), style = line.style_dashed, width = 1)
+    if (PeriodRollovers_LabelEnabled)
+        label.new(x = bar_index, y = SmoothedCompositeValueArea_High, text = "New " + tfString(Timeframe_2), xloc = xloc.bar_index, yloc = yloc.price, color = color.new(resistanceColor1,70), textcolor = chart.fg_color, style = label.style_label_down, size = getSize(PeriodRollovers_LabelSize),
+          textalign = text.align_center)
+if (f_is_new_bar(Timeframe_3) and Enable_VA_3)
+    if (PeriodRollovers_ShowLabelLine)
+        line.new(x1 = bar_index, y1 = SmoothedCompositeValueArea_Low, x2 = bar_index, y2 = SmoothedCompositeValueArea_High, xloc = xloc.bar_index, color = color.new(chart.fg_color, 70), style = line.style_dashed, width = 1)
+    if (PeriodRollovers_LabelEnabled)
+        label.new(x = bar_index, y = SmoothedCompositeValueArea_Low, text = "New " + tfString(Timeframe_3), xloc = xloc.bar_index, yloc = yloc.price, color = color.new(supportColor1,70), textcolor = chart.fg_color, style = label.style_label_up, size = getSize(PeriodRollovers_LabelSize),
+          textalign = text.align_center)
