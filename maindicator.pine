@@ -1,5 +1,5 @@
 //@version=5
-indicator(title='OB+PVP+Weeknd+Opens+NYO', overlay=true)
+indicator(title='OB+PVP+Weeknd+Opens+NYO', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
 
 bool        pv2_sv          = input.bool        (false,                          title='Plot 2nd order pivots')
 bool        msb_sv          = input.bool        (false,                           title='Plot MSB lines')
@@ -296,8 +296,8 @@ var i_isWeeklyEnabled = input.bool(defval=true, title='Weekly', group='Current O
 var i_weeklyColor = input.color(defval=color.orange, title='', group='Current Opens', inline='Weekly')
 var i_isMonthlyEnabled = input.bool(defval=true, title='Monthly', group='Current Opens', inline='Monthly')
 var i_monthlyColor = input.color(defval=color.red, title='', group='Current Opens', inline='Monthly')
-var i_isYearlyEnabled = input.bool(defval=false, title='Yearly', group='Current Opens', inline='Yearly')
-var i_yearlyColor = input.color(defval=color.blue, title='', group='Current Opens', inline='Yearly')
+// var i_isYearlyEnabled = input.bool(defval=false, title='Yearly', group='Current Opens', inline='Yearly')
+// var i_yearlyColor = input.color(defval=color.blue, title='', group='Current Opens', inline='Yearly')
 
 var i_isPDailyEnabled = input.bool(defval=false, title='Daily', group='Previous Opens', inline='Daily')
 var i_pdailyColor = input.color(defval=color.green, title='', group='Previous Opens', inline='Daily')
@@ -305,8 +305,8 @@ var i_isPWeeklyEnabled = input.bool(defval=true, title='Weekly', group='Previous
 var i_pweeklyColor = input.color(defval=color.orange, title='', group='Previous Opens', inline='Weekly')
 var i_isPMonthlyEnabled = input.bool(defval=true, title='Monthly', group='Previous Opens', inline='Monthly')
 var i_pmonthlyColor = input.color(defval=color.red, title='', group='Previous Opens', inline='Monthly')
-var i_isPYearlyEnabled = input.bool(defval=false, title='Yearly', group='Previous Opens', inline='Yearly')
-var i_pyearlyColor = input.color(defval=color.blue, title='', group='Previous Opens', inline='Yearly')
+// var i_isPYearlyEnabled = input.bool(defval=false, title='Yearly', group='Previous Opens', inline='Yearly')
+// var i_pyearlyColor = input.color(defval=color.blue, title='', group='Previous Opens', inline='Yearly')
 
 var i_isMondayHighEnabled = input.bool(defval=true, title='Monday High', group='Current High/Low', inline='Monday High')
 var i_mondayHighColor = input.color(defval=color.lime, title='', group='Current High/Low', inline='Monday High')
@@ -324,10 +324,10 @@ var i_isMonthlyHEnabled = input.bool(defval=false, title='Monthly High', group='
 var i_monthlyHColor = input.color(defval=color.red, title='', group='Current High/Low', inline='Monthly High')
 var i_isMonthlyLEnabled = input.bool(defval=false, title='Monthly Low', group='Current High/Low', inline='Monthly Low')
 var i_monthlyLColor = input.color(defval=color.red, title='', group='Current High/Low', inline='Monthly Low')
-var i_isYearlyHEnabled = input.bool(defval=false, title='Yearly High', group='Current High/Low', inline='Yearly High')
-var i_yearlyHColor = input.color(defval=color.orange, title='', group='Current High/Low', inline='Yearly High')
-var i_isYearlyLEnabled = input.bool(defval=false, title='Yearly Low', group='Current High/Low', inline='Yearly Low')
-var i_yearlyLColor = input.color(defval=color.orange, title='', group='Current High/Low', inline='Yearly Low')
+// var i_isYearlyHEnabled = input.bool(defval=false, title='Yearly High', group='Current High/Low', inline='Yearly High')
+// var i_yearlyHColor = input.color(defval=color.orange, title='', group='Current High/Low', inline='Yearly High')
+// var i_isYearlyLEnabled = input.bool(defval=false, title='Yearly Low', group='Current High/Low', inline='Yearly Low')
+// var i_yearlyLColor = input.color(defval=color.orange, title='', group='Current High/Low', inline='Yearly Low')
 
 var i_isPDailyHEnabled = input.bool(defval=false, title='Daily High', group='Previous High/Low', inline='Daily High')
 var i_pdailyHColor = input.color(defval=color.green, title='', group='Previous High/Low', inline='Daily High')
@@ -341,10 +341,10 @@ var i_isPMonthlyHEnabled = input.bool(defval=false, title='Monthly High', group=
 var i_pmonthlyHColor = input.color(defval=color.red, title='', group='Previous High/Low', inline='Monthly High')
 var i_isPMonthlyLEnabled = input.bool(defval=false, title='Monthly Low', group='Previous High/Low', inline='Monthly Low')
 var i_pmonthlyLColor = input.color(defval=color.red, title='', group='Previous High/Low', inline='Monthly Low')
-var i_isPYearlyHEnabled = input.bool(defval=false, title='Yearly High', group='Previous High/Low', inline='Yearly High')
-var i_pyearlyHColor = input.color(defval=color.orange, title='', group='Previous High/Low', inline='Yearly High')
-var i_isPYearlyLEnabled = input.bool(defval=false, title='Yearly Low', group='Previous High/Low', inline='Yearly Low')
-var i_pyearlyLColor = input.color(defval=color.orange, title='', group='Previous High/Low', inline='Yearly Low')
+//var i_isPYearlyHEnabled = input.bool(defval=false, title='Yearly High', group='Previous High/Low', inline='Yearly High')
+//var i_pyearlyHColor = input.color(defval=color.orange, title='', group='Previous High/Low', inline='Yearly High')
+//var i_isPYearlyLEnabled = input.bool(defval=false, title='Yearly Low', group='Previous High/Low', inline='Yearly Low')
+//var i_pyearlyLColor = input.color(defval=color.orange, title='', group='Previous High/Low', inline='Yearly Low')
 
 var i_isTailsEnabled = input.bool(defval=true, title='Show Tails', group='Settings')
 var i_projectionOffset = input.int(defval=1, title='Offset', group='Settings')
@@ -352,12 +352,12 @@ var i_projectionOffset = input.int(defval=1, title='Offset', group='Settings')
 var i_doStr = input.string(defval="DO", title="Daily Opening Label", group="Label Captions")
 var i_woStr = input.string(defval="WO", title="Weekly Opening Label", group="Label Captions")
 var i_moStr = input.string(defval="MO", title="Monthly Opening Label", group="Label Captions")
-var i_yoStr = input.string(defval="YO", title="Yearly Opening Label", group="Label Captions")
+//var i_yoStr = input.string(defval="YO", title="Yearly Opening Label", group="Label Captions")
 
 var i_pdoStr = input.string(defval="PDO", title="Previous Daily Opening Label", group="Label Captions")
 var i_pwoStr = input.string(defval="PWO", title="Previous Weekly Opening Label", group="Label Captions")
 var i_pmoStr = input.string(defval="PMO", title="Previous Monthly Opening Label", group="Label Captions")
-var i_pyoStr = input.string(defval="PYO", title="Previous Yearly Opening Label", group="Label Captions")
+//var i_pyoStr = input.string(defval="PYO", title="Previous Yearly Opening Label", group="Label Captions")
 
 var i_dhStr = input.string(defval="DH", title="Daily High Label", group="Label Captions")
 var i_dlStr = input.string(defval="DL", title="Daily Low Label", group="Label Captions")
@@ -365,8 +365,8 @@ var i_whStr = input.string(defval="WH", title="Weekly High Label", group="Label 
 var i_wlStr = input.string(defval="WL", title="Weekly Low Label", group="Label Captions")
 var i_mhStr = input.string(defval="MH", title="Monthly High Label", group="Label Captions")
 var i_mlStr = input.string(defval="ML", title="Monthly Low Label", group="Label Captions")
-var i_yhStr = input.string(defval="YH", title="Yearly High Label", group="Label Captions")
-var i_ylStr = input.string(defval="YL", title="Yearly High Label", group="Label Captions")
+//var i_yhStr = input.string(defval="YH", title="Yearly High Label", group="Label Captions")
+//var i_ylStr = input.string(defval="YL", title="Yearly High Label", group="Label Captions")
 
 var i_pdhStr = input.string(defval="PDH", title="Previous Daily High Label", group="Label Captions")
 var i_pdlStr = input.string(defval="PDL", title="Previous Daily Low Label", group="Label Captions")
@@ -374,8 +374,8 @@ var i_pwhStr = input.string(defval="PWH", title="Previous Weekly High Label", gr
 var i_pwlStr = input.string(defval="PWL", title="Previous Weekly Low Label", group="Label Captions")
 var i_pmhStr = input.string(defval="PMH", title="Previous Monthly High Label", group="Label Captions")
 var i_pmlStr = input.string(defval="PML", title="Previous Monthly Low Label", group="Label Captions")
-var i_pyhStr = input.string(defval="PYH", title="Previous Yearly High Label", group="Label Captions")
-var i_pylStr = input.string(defval="PYL", title="Previous Yearly Low Label", group="Label Captions")
+//var i_pyhStr = input.string(defval="PYH", title="Previous Yearly High Label", group="Label Captions")
+//var i_pylStr = input.string(defval="PYL", title="Previous Yearly Low Label", group="Label Captions")
 
 
 var i_monhStr = input.string(defval="MH", title="Monday High Label", group="Label Captions")
@@ -386,12 +386,12 @@ var i_monlStr = input.string(defval="ML", title="Monday Low Label", group="Label
 [dailyTime, dailyOpen, dailyHigh, dailyLow] = request.security(syminfo.tickerid, timeframe.isintraday ? '1440' : 'D', [time, open, high, low], lookahead=barmerge.lookahead_off)
 [weeklyTime, weeklyOpen, weeklyHigh, weeklyLow] = request.security(syminfo.tickerid, 'W', [time, open, high, low], lookahead=barmerge.lookahead_off)
 [monthlyTime, monthlyOpen, monthlyHigh, monthlyLow] = request.security(syminfo.tickerid, 'M', [time, open, high, low], lookahead=barmerge.lookahead_off)
-[yearlyTime, yearlyOpen, yearlyHigh, yearlyLow] = request.security(syminfo.tickerid, '12M', [time, open, high, low], lookahead=barmerge.lookahead_off)
+//[yearlyTime, yearlyOpen, yearlyHigh, yearlyLow] = request.security(syminfo.tickerid, '12M', [time, open, high, low], lookahead=barmerge.lookahead_off)
 
 [pdailyTime, pdailyOpen, pdailyHigh, pdailyLow] = request.security(syminfo.tickerid, timeframe.isintraday ? '1440' : 'D', [time[1], open[1], high[1], low[1]], lookahead=barmerge.lookahead_off)
 [pweeklyTime, pweeklyOpen, pweeklyHigh, pweeklyLow] = request.security(syminfo.tickerid, 'W', [time[1], open[1], high[1], low[1]], lookahead=barmerge.lookahead_off)
 [pmonthlyTime, pmonthlyOpen, pmonthlyHigh, pmonthlyLow] = request.security(syminfo.tickerid, 'M', [time[1], open[1], high[1], low[1]], lookahead=barmerge.lookahead_off)
-[pyearlyTime, pyearlyOpen, pyearlyHigh, pyearlyLow] = request.security(syminfo.tickerid, '12M', [time[1], open[1], high[1], low[1]], lookahead=barmerge.lookahead_off)
+//[pyearlyTime, pyearlyOpen, pyearlyHigh, pyearlyLow] = request.security(syminfo.tickerid, '12M', [time[1], open[1], high[1], low[1]], lookahead=barmerge.lookahead_off)
 
 day = dayofweek(timenow)
 mondayOffset= day == dayofweek.monday ? 0 : day == dayofweek.tuesday ? 1 : day == dayofweek.wednesday ? 2 : day == dayofweek.thursday ? 3 : day == dayofweek.friday ? 4 : day == dayofweek.saturday ? 5 : 6
@@ -436,14 +436,14 @@ f_drawCompleteLine(v_margin, v_open, v_time, v_color, v_str) =>
 var canShowDaily = timeframe.isintraday
 var canShowWeekly = (timeframe.isintraday or timeframe.isdaily)
 var canShowMonthly = (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly)
-var canShowYearly = (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly or timeframe.ismonthly and timeframe.multiplier < 12)
+//var canShowYearly = (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly or timeframe.ismonthly and timeframe.multiplier < 12)
 
 wo = weeklyOpen
 wt = weeklyTime
 mo = monthlyOpen
 mt = monthlyTime
-yo = yearlyOpen
-yt = yearlyTime
+//yo = yearlyOpen
+//yt = yearlyTime
 
 // Markets with extended sessions (e.g. TSLA) are available for intradays charts only
 // As the yearly, monthly and weekly data come respectively from the 12M, 1M, 1W timeframes, extended hours are excluded
@@ -461,7 +461,7 @@ var float extMonthlyLow = na
 var float extYearlyLow = na
 var int extWeeklyTime = na
 var int extMonthlyTime = na
-var int extYearlyTime = na
+//var int extYearlyTime = na
 
 if timeframe.isintraday and syminfo.session == session.extended
     if weekofyear != weekofyear[1]
@@ -476,35 +476,35 @@ if timeframe.isintraday and syminfo.session == session.extended
         extMonthlyLow := dailyLow
         extMonthlyTime := dailyTime
         extMonthlyTime
-    if year != year[1]
-        extYearlyOpen := dailyOpen
-        extYearlyHigh := dailyHigh
-        extYearlyLow := dailyLow
-        extYearlyTime := dailyTime
-        extYearlyTime
+    // if year != year[1]
+    //     extYearlyOpen := dailyOpen
+    //     extYearlyHigh := dailyHigh
+    //     extYearlyLow := dailyLow
+    //     extYearlyTime := dailyTime
+    //     extYearlyTime
 
     wo := extWeeklyOpen
     wt := extWeeklyTime
     mo := extMonthlyOpen
     mt := extMonthlyTime
-    yo := extYearlyOpen
-    yt := extYearlyTime
-    yt
+    //yo := extYearlyOpen
+    //yt := extYearlyTime
+    //yt
 
 // On the weekly timeframe, pinescript draws lines from the first weekly candle whose start date belongs to a given month/year
 // E.g. if the first weekly candle of the month start date is the 3rd of Feb, then the monthly open line is drawn from this candle
 // In such case, we visually want it to be anchored on the previous week which contains the 1st Feb
 
 var int weeklyTimeOnYearChange = na
-var int x1YearlyAnchor = na
+//var int x1YearlyAnchor = na
 var int weeklyTimeOnMonthChange = na
 var int x1MonthlyAnchor = na
 
 if timeframe.isweekly
-    if yearlyTime != yearlyTime[1]
-        weeklyTimeOnYearChange := weeklyTime
-        x1YearlyAnchor := weeklyTime[1]
-        x1YearlyAnchor
+    // if yearlyTime != yearlyTime[1]
+    //     weeklyTimeOnYearChange := weeklyTime
+    //     x1YearlyAnchor := weeklyTime[1]
+    //     x1YearlyAnchor
     if monthlyTime != monthlyTime[1]
         weeklyTimeOnMonthChange := weeklyTime
         x1MonthlyAnchor := weeklyTime[1]
@@ -512,9 +512,9 @@ if timeframe.isweekly
 
     // Theorically we would adjust the position if the weekly start date is different than the 1st
     // Which pratically result actually of the first day of the month/year considering holidays
-    if dayofmonth(weeklyTimeOnYearChange) != dayofmonth(yearlyTime)
-        yt := x1YearlyAnchor
-        yt
+    // if dayofmonth(weeklyTimeOnYearChange) != dayofmonth(yearlyTime)
+    //     yt := x1YearlyAnchor
+    //     yt
     if dayofmonth(weeklyTimeOnMonthChange) != dayofmonth(monthlyTime)
         mt := x1MonthlyAnchor
         mt
@@ -525,20 +525,20 @@ if barstate.islast
     //
     // Yearly
     //
-    if canShowYearly
-        _margin = 0
-        if i_isYearlyEnabled
-            f_drawCompleteLine(_margin, yearlyOpen, yearlyTime, i_yearlyColor, i_yoStr)
-        if i_isPYearlyEnabled
-            f_drawCompleteLine(_margin+1, pyearlyOpen, pyearlyTime, i_pyearlyColor, i_pyoStr)
-        if i_isYearlyHEnabled
-            f_drawCompleteLine(_margin, yearlyHigh, yearlyTime, i_yearlyHColor, i_yhStr)
-        if i_isPYearlyHEnabled
-            f_drawCompleteLine(_margin+1, pyearlyHigh, pyearlyTime, i_pyearlyHColor, i_pyhStr)
-        if i_isYearlyLEnabled
-            f_drawCompleteLine(_margin, yearlyLow, yearlyTime, i_yearlyLColor, i_ylStr)
-        if i_isPYearlyLEnabled
-            f_drawCompleteLine(_margin+1, pyearlyLow, pyearlyTime, i_pyearlyLColor, i_pylStr)
+    // if canShowYearly
+    //     _margin = 0
+    //     if i_isYearlyEnabled
+    //         f_drawCompleteLine(_margin, yearlyOpen, yearlyTime, i_yearlyColor, i_yoStr)
+    //     if i_isPYearlyEnabled
+    //         f_drawCompleteLine(_margin+1, pyearlyOpen, pyearlyTime, i_pyearlyColor, i_pyoStr)
+    //     if i_isYearlyHEnabled
+    //         f_drawCompleteLine(_margin, yearlyHigh, yearlyTime, i_yearlyHColor, i_yhStr)
+    //     if i_isPYearlyHEnabled
+    //         f_drawCompleteLine(_margin+1, pyearlyHigh, pyearlyTime, i_pyearlyHColor, i_pyhStr)
+    //     if i_isYearlyLEnabled
+    //         f_drawCompleteLine(_margin, yearlyLow, yearlyTime, i_yearlyLColor, i_ylStr)
+    //     if i_isPYearlyLEnabled
+    //         f_drawCompleteLine(_margin+1, pyearlyLow, pyearlyTime, i_pyearlyLColor, i_pylStr)
 
     //
     // Monthly
@@ -662,3 +662,156 @@ if i8Display
             if not i8History
                 line.delete(lne2[1])
 //===========================
+
+// ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————— \\
+// —————— Tips
+TTmode       = 'Data Type - Choose Single or Aggregated data.'
+TTspot       = 'Spot Volume Pairs'
+TTperp       = 'Futures Volume Pairs'
+TTEX         = 'You can write any name of the exchange in any field in the Exchanges group and get the result. Example: BITMEX\nHUOBI\nMEXC\nGATEIO and others. \n*Be careful and check if there is such a ticker on TV.'
+
+// —————— Inputs
+groupset     = 'SETTINGS'
+coinusd      = input.string('USD',           'Volume By',                          group = groupset, inline = 'MODE', options = ['COIN', 'USD'])
+datatype     = input.string('Aggregated',    'Data Type',                          group = groupset, inline = 'MODE', options = ['Aggregated', 'Single'], tooltip = TTmode)
+delta_type   = input.string('Both',          'Delta Type',                         group = groupset, inline = 'DELT', options = ['Both', 'Bullish', 'Bearish'])
+lookback     = input.int   (250,             'Volume Lookback Depth',              group = groupset, minval = 10, maxval = 1000, step = 10)
+max_bars     = input.int   (500,             'Number of Bars',                     group = groupset, minval = 10, maxval = 500, step = 25)
+bar_mult     = input.int   (35,              'Bar Length Multiplier',              group = groupset, minval = 10, maxval = 100, step = 5)
+bar_offset   = input.int   (35,              'Bar Horizontal Offset',              group = groupset, minval = 0, maxval = 100, step = 5)
+bar_width    = input.int   (1,               'Bar Width',                          group = groupset, minval = 1, maxval = 20)
+poc_show     = input.bool  (true,            'Show POC Line',                      group = groupset, inline = 'DELT')
+bar_color    = input.color (#335367,       'Bar Color',                          group = groupset, inline = 'COLR')
+poc_color    = input.color (#a13c44,       'POC Color',                          group = groupset, inline = 'COLR')
+
+groupcur     = '➤Currency'
+PERP1        = input.bool  (true,            'USD.P',                               group = groupcur, inline = 'CUR1')
+PERP2        = input.bool  (true,            'USDT.P',                              group = groupcur, inline = 'CUR1', tooltip = TTperp)
+SPOT1        = input.bool  (true,            'USDT',                                group = groupcur, inline = 'CUR2')
+SPOT2        = input.bool  (true,            'USDC',                                group = groupcur, inline = 'CUR2')
+
+groupexc     = '➤Exchanges'
+EX_NO1       = input.bool  (true,            '1',                                   group = groupexc, inline = 'EX1')
+IN_NO1       = input.string('BINANCE',       '',                                    group = groupexc, inline = 'EX1')
+EX_NO2       = input.bool  (true,            '2',                                   group = groupexc, inline = 'EX1')
+IN_NO2       = input.string('BYBIT',         '',                                    group = groupexc, inline = 'EX1')
+EX_NO3       = input.bool  (true,            '3',                                   group = groupexc, inline = 'EX1')
+IN_NO3       = input.string('OKEX',          '',                                    group = groupexc, inline = 'EX1')
+EX_NO4       = input.bool  (true,            '4',                                   group = groupexc, inline = 'EX2')
+IN_NO4       = input.string('COINBASE',      '',                                    group = groupexc, inline = 'EX2')
+EX_NO5       = input.bool  (true,            '5',                                   group = groupexc, inline = 'EX2')
+IN_NO5       = input.string('BITFINEX',      '',                                    group = groupexc, inline = 'EX2')
+EX_NO6       = input.bool  (true,            '6',                                   group = groupexc, inline = 'EX2')
+IN_NO6       = input.string('BITSTAMP',      '',                                    group = groupexc, inline = 'EX2')
+EX_NO7       = input.bool  (true,            '7',                                   group = groupexc, inline = 'EX3')
+IN_NO7       = input.string('DERIBIT',       '',                                    group = groupexc, inline = 'EX3')
+EX_NO8       = input.bool  (true,            '8',                                   group = groupexc, inline = 'EX3')
+IN_NO8       = input.string('MEXC',        '',                                      group = groupexc, inline = 'EX3', tooltip = TTEX)
+
+// ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————— \\
+// —————— Aggregated Volume Calculate
+Vtype = str.lower(syminfo.volumetype)
+CurrentVolume = Vtype=='tick' or Vtype=='quote' or Vtype=='usd' ? volume / close : volume
+
+GetTicker(exchange, typeSymbol) =>
+    GetTicker = exchange + ':' + syminfo.basecurrency + typeSymbol
+    FixBitmex = exchange == 'BITMEX' ? str.replace(GetTicker, 'BTC', 'XBT') : GetTicker
+    Ticker    = FixBitmex
+
+GetRequest(Ticker) =>
+    GetVolume = request.security(Ticker, timeframe.period, CurrentVolume, ignore_invalid_symbol=true)
+    CheckVolume = GetVolume[1] > 0 ? GetVolume : 0
+
+GetExchange(typeSymbol)=>
+    EX_1 = EX_NO1 ? GetRequest( GetTicker(IN_NO1, typeSymbol) ) : 0
+    EX_2 = EX_NO2 ? GetRequest( GetTicker(IN_NO2, typeSymbol) ) : 0
+    EX_3 = EX_NO3 ? GetRequest( GetTicker(IN_NO3, typeSymbol) ) : 0
+    EX_4 = EX_NO4 ? GetRequest( GetTicker(IN_NO4, typeSymbol) ) : 0
+    EX_5 = EX_NO5 ? GetRequest( GetTicker(IN_NO5, typeSymbol) ) : 0
+    EX_6 = EX_NO6 ? GetRequest( GetTicker(IN_NO6, typeSymbol) ) : 0
+    EX_7 = EX_NO7 ? GetRequest( GetTicker(IN_NO7, typeSymbol) ) : 0
+    EX_8 = EX_NO8 ? GetRequest( GetTicker(IN_NO8, typeSymbol) ) : 0
+    [EX_1, EX_2, EX_3, EX_4, EX_5, EX_6, EX_7, EX_8]
+
+EditVolume(type)=>
+    Type = array.sum(type)
+    Volume = coinusd == 'USD' ? Type*close : Type
+    Volume
+
+// —————— Get Volume 
+[PERP2_1, PERP2_2, PERP2_3, PERP2_4, PERP2_5, PERP2_6, PERP2_7, PERP2_8] = GetExchange(PERP1 ? 'USDT.P' : '0')
+[PERP1_1, PERP1_2, PERP1_3, PERP1_4, PERP1_5, PERP1_6, PERP1_7, PERP1_8] = GetExchange(PERP2 ? 'USD.P'  : '0')
+[SPOT1_1, SPOT1_2, SPOT1_3, SPOT1_4, SPOT1_5, SPOT1_6, SPOT1_7, SPOT1_8] = GetExchange(SPOT1 ? 'USDT'   : '0')
+[SPOT2_1, SPOT2_2, SPOT2_3, SPOT2_4, SPOT2_5, SPOT2_6, SPOT2_7, SPOT2_8] = GetExchange(SPOT2 ? 'USDC'   : '0')
+
+// —————— Processing Volume
+GetSpotEX_1 = EditVolume(array.from(SPOT1_1, SPOT2_1)),     GetPerpEX_1 = EditVolume(array.from(PERP1_1, PERP2_1))
+GetSpotEX_2 = EditVolume(array.from(SPOT1_2, SPOT2_2)),     GetPerpEX_2 = EditVolume(array.from(PERP1_2, PERP2_2))
+GetSpotEX_3 = EditVolume(array.from(SPOT1_3, SPOT2_3)),     GetPerpEX_3 = EditVolume(array.from(PERP1_3, PERP2_3))
+GetSpotEX_4 = EditVolume(array.from(SPOT1_4, SPOT2_4)),     GetPerpEX_4 = EditVolume(array.from(PERP1_4, PERP2_4))
+GetSpotEX_5 = EditVolume(array.from(SPOT1_5, SPOT2_5)),     GetPerpEX_5 = EditVolume(array.from(PERP1_5, PERP2_5))
+GetSpotEX_6 = EditVolume(array.from(SPOT1_6, SPOT2_6)),     GetPerpEX_6 = EditVolume(array.from(PERP1_6, PERP2_6))
+GetSpotEX_7 = EditVolume(array.from(SPOT1_7, SPOT2_7)),     GetPerpEX_7 = EditVolume(array.from(PERP1_7, PERP2_7))
+GetSpotEX_8 = EditVolume(array.from(SPOT1_8, SPOT2_8)),     GetPerpEX_8 = EditVolume(array.from(PERP1_8, PERP2_8))
+
+SPOT   = GetSpotEX_1 + GetSpotEX_2 + GetSpotEX_3 + GetSpotEX_4 + GetSpotEX_5 + GetSpotEX_6 + GetSpotEX_7 + GetSpotEX_8
+PERP   = GetPerpEX_1 + GetPerpEX_2 + GetPerpEX_3 + GetPerpEX_4 + GetPerpEX_5 + GetPerpEX_6 + GetPerpEX_7 + GetPerpEX_8
+Volume = datatype == 'Single' ? EditVolume(array.from(CurrentVolume)) : SPOT + PERP + (EditVolume(array.from(CurrentVolume)))
+
+// ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————— \\
+// —————————————————————————————————————————————————   Volume Profile   ——————————————————————————————————————————————————— \\
+// ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————— \\
+float Vmax = 0.0
+int VmaxId = 0
+var int first = time
+price_levels = array.new_float(max_bars + 1, 0.0)
+interval_volumes = array.new_float(max_bars, 0.0)
+volumes_totals = array.new_float(max_bars, 0.0)
+bar_widths = array.new_int(max_bars, 0)
+
+float HH = ta.highest(high, lookback)
+float LL = ta.lowest(low, lookback)
+
+if barstate.islast
+    float HL = (HH - LL) / max_bars
+    for j = 1 to max_bars + 1 by 1
+        array.set(price_levels, j - 1, LL + HL * j)
+    for i = 0 to lookback - 1 by 1
+        int j_interval_count = 0
+        array.fill(volumes_totals, 0.0)
+        for j = 0 to max_bars - 1 by 1
+            float j_price_level = array.get(price_levels, j)
+            if low[i] < j_price_level and high[i] > j_price_level and (delta_type == 'Bullish' ? close[i] >= open[i] : delta_type == 'Bearish' ? close[i] <= open[i] : true)
+                float j_volumes_totals = array.get(volumes_totals, j)
+                float new_volume_total = j_volumes_totals + nz(Volume[i])
+                array.set(volumes_totals, j, new_volume_total)
+                j_interval_count += 1
+                j_interval_count
+        for j = 0 to max_bars - 1 by 1
+            float j_interval_volume = array.get(interval_volumes, j)
+            float j_volumes_totals = array.get(volumes_totals, j)
+            float dj_interval_volume = j_interval_volume + (j_interval_count > 0 ? j_volumes_totals / j_interval_count : 0.0)
+            array.set(interval_volumes, j, dj_interval_volume)
+    Vmax := array.max(interval_volumes)
+    VmaxId := array.indexof(interval_volumes, Vmax)
+    for j = 0 to max_bars - 1 by 1
+        float j_interval_volume = array.get(interval_volumes, j)
+        int j_bar_widths = math.round(bar_mult * j_interval_volume / Vmax)
+        array.set(bar_widths, j, j_bar_widths)
+
+if barstate.isfirst
+    first := time
+    first
+change = ta.change(time)
+x_loc = timenow + math.round(change * bar_offset)
+
+f_setup_bar(n) =>
+    x1 = VmaxId == n and poc_show ? math.max(time[lookback], first) : timenow + math.round(change * (bar_offset - array.get(bar_widths, n)))
+    ys = array.get(price_levels, n)
+    line.new(x1=x1, y1=ys, x2=x_loc, y2=ys, xloc=xloc.bar_time, extend=extend.none, color=VmaxId == n ? poc_color : bar_color, style=line.style_solid, width=bar_width)
+
+if barstate.islast
+    for i = 0 to max_bars - 1 by 1
+        f_setup_bar(i)
+
+// ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————— \\
