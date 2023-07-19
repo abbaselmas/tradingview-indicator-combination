@@ -1,5 +1,5 @@
 //@version=5
-indicator(title='OB+PVP+Weeknd+Opens+NYO', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
+indicator(title='Abbas', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
 
 bool        pv2_sv          = input.bool        (false,                          title='Plot 2nd order pivots')
 bool        msb_sv          = input.bool        (false,                           title='Plot MSB lines')
@@ -276,7 +276,6 @@ if barstate.isconfirmed
         if new_pl_2nd
             array.push(la_pl2, label.new(x = array.get(pvl2_time, 0), y = array.get(pvl2_price, 0), xloc = xloc.bar_index, style = label.style_label_up,      color = #007700FF, size = size.tiny))
 
-
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -322,7 +321,6 @@ if iMDisplay
                 line.delete(lne[1])
 //===========================
 
-
 //==== 8:30 Open ====
 if i8Display
     var open830  = 0.0
@@ -357,14 +355,14 @@ groupset     = 'SETTINGS'
 coinusd      = input.string('USD',           'Volume By',                          group = groupset, inline = 'MODE', options = ['COIN', 'USD'])
 datatype     = input.string('Aggregated',    'Data Type',                          group = groupset, inline = 'MODE', options = ['Aggregated', 'Single'], tooltip = TTmode)
 delta_type   = input.string('Both',          'Delta Type',                         group = groupset, inline = 'DELT', options = ['Both', 'Bullish', 'Bearish'])
-lookback     = input.int   (250,             'Volume Lookback Depth',              group = groupset, minval = 10, maxval = 1000, step = 10)
+lookback     = input.int   (336,             'Volume Lookback Depth',              group = groupset, minval = 10, maxval = 1000, step = 10), tooltip = '336 bars = 1 week on 30m chart'
 max_bars     = input.int   (500,             'Number of Bars',                     group = groupset, minval = 10, maxval = 500, step = 25)
-bar_mult     = input.int   (35,              'Bar Length Multiplier',              group = groupset, minval = 10, maxval = 100, step = 5)
-bar_offset   = input.int   (35,              'Bar Horizontal Offset',              group = groupset, minval = 0, maxval = 100, step = 5)
+bar_mult     = input.int   (35,              'Bar Length Multiplier',              group = groupset, minval = 10, maxval = 100, step = 2)
+bar_offset   = input.int   (55,              'Bar Horizontal Offset',              group = groupset, minval = 0, maxval = 100, step = 2)
 bar_width    = input.int   (1,               'Bar Width',                          group = groupset, minval = 1, maxval = 20)
 poc_show     = input.bool  (true,            'Show POC Line',                      group = groupset, inline = 'DELT')
-bar_color    = input.color (#335367,       'Bar Color',                          group = groupset, inline = 'COLR')
-poc_color    = input.color (#a13c44,       'POC Color',                          group = groupset, inline = 'COLR')
+bar_color    = input.color (#707070,       'Bar Color',                          group = groupset, inline = 'COLR')
+poc_color    = input.color (#17C400,       'POC Color',                          group = groupset, inline = 'COLR')
 
 groupcur     = '➤Currency'
 PERP1        = input.bool  (true,            'USD.P',                               group = groupcur, inline = 'CUR1')
@@ -504,31 +502,16 @@ DanCCDailyInputColor = input.color(color.blue, title='Daily', group='User Select
 DanCCWeeklyInputColor = input.color(color.yellow, title='Weekly', group='User Selectable Line Colors', inline='Input 0')
 DanCCMonthlyInputColor = input.color(color.purple, title='Monthly', group='User Selectable Line Colors', inline='Input 0')
 
-
 //Daily Open
-DVWAPTxtLabelColor = NoLabel ? DanCCDailyInputColor : color.white
 WVWAPTxtLabelColor = NoLabel ? DanCCWeeklyInputColor : color.black
 MVWAPTxtLabelColor = NoLabel ? DanCCMonthlyInputColor : color.white
-A48VWAPTxtLabelColor = NoLabel ? color.navy : color.white
 A24VWAPTxtLabelColor = NoLabel ? color.blue : color.white
 
 /////////////////////////////////VWAPs
-show_DVWAPs = input.bool(false, title='Daily', group='Standard VWAPS - Daily, Weekly, Monthly', inline='VWAP1')
 show_WVWAPs = input.bool(false, title='Weekly', group='Standard VWAPS - Daily, Weekly, Monthly', inline='VWAP1')
 show_MVWAPs = input.bool(false, title='Monthly', group='Standard VWAPS - Daily, Weekly, Monthly', inline='VWAP1', tooltip='M-VWAP only shows on the 5 min and above timeframe / \'Live 24\' hour constantly updating VWAP')
 
-show_pdDVWAPs = input.bool(false, title='Previous Day Close', group='Optional VWAPS', inline='VWAP1')
 show_Live24VWAPs = input.bool(false, title='Live 24', group='Optional VWAPS', inline='VWAP1')
-show_48VWAPs = input.bool(false, title='2D', group='Optional VWAPS', inline='VWAP1', tooltip='pdVWAP = Previous Day VWAP CLosing Price / \'Live 24\' hour constantly updating VWAP / Rolling 2 day VWAP')
-
-show_pdDVWAPs_color = show_pdDVWAPs ? DanCCDailyInputColor : na
-show_pdDVWAPs_text = show_pdDVWAPs ? DVWAPTxtLabelColor : na
-show_DVWAPs_color = show_DVWAPs ? DanCCDailyInputColor : na
-show_DVWAPs_text = show_DVWAPs ? DVWAPTxtLabelColor : na
-
-show_48VWAPs_color = show_48VWAPs ? color.navy : na
-show_48VWAPs_text = show_48VWAPs ? A48VWAPTxtLabelColor : na
-
 show_Live24VWAPs_color = show_Live24VWAPs ? color.blue : na
 show_Live24VWAPs_text = show_Live24VWAPs ? A24VWAPTxtLabelColor : na
 
@@ -538,7 +521,6 @@ show_MVWAPs_color = show_MVWAPs ? DanCCMonthlyInputColor : na
 show_MVWAPs_text = show_MVWAPs ? MVWAPTxtLabelColor : na
 
 is_today = year == year(timenow) and month == month(timenow) and dayofmonth == dayofmonth(timenow)
-
 
 ///VWAP rounding issue resolution 
 f_round_up_to_tick(x, mintick) =>
@@ -552,182 +534,34 @@ f_round_down_to_tick(x, mintick) =>
     value
 /////////////////////////////////////////////////
 
-//Daily VWAP
-roundedVWAP = f_round_up_to_tick(ta.vwap, syminfo.mintick)
-VWAP = roundedVWAP
-//VWAP = round(vwap)
-plot(VWAP, 'D-VWAP', is_today ? show_DVWAPs_color : na, offset=0)
-var label VWAPLabel = na
-VWAPLabel := label.new(timenow, VWAP, xloc=xloc.bar_time, text=PriceLocation + 'D-VWAP -   ' + str.tostring(VWAP), color=show_DVWAPs_color, textcolor=show_DVWAPs_text, style=NoLabelOption, size=LabelSize)
-label.delete(VWAPLabel[1])
-
-
-//Previous Day's Closing Vwap
-newday(res) =>
-    t = time(res)
-    ta.change(t) != 0 ? 1 : 0
-new_day = newday('D')
-pdVWAP = ta.valuewhen(new_day, VWAP[1], 0)
-plot(pdVWAP, 'pdVWAP', is_today ? show_pdDVWAPs_color : na, offset=0)
-
-//plot(pdVWAP, "pdVWAP", change(pdVWAP) ? na : show_DVWAPs_color,  offset = 0)
-var label pdVWAPLabel = na
-pdVWAPLabel := label.new(timenow, pdVWAP, xloc=xloc.bar_time, text=PriceLocation + 'pdVWAP -   ' + str.tostring(pdVWAP), color=show_pdDVWAPs_color, textcolor=show_pdDVWAPs_text, style=NoLabelOption, size=LabelSize)
-label.delete(pdVWAPLabel[1])
-
 //Weeekly VWAP
 src = hlc3
 wt = time('W')
-
 wstart = na(wt[1]) or wt > wt[1]
-
 wsumSrc = src * volume
 wsumVol = volume
 wsumSrc := wstart ? wsumSrc : wsumSrc + wsumSrc[1]
 wsumVol := wstart ? wsumVol : wsumVol + wsumVol[1]
-
 WVWAP = wsumSrc / wsumVol
 wvw = f_round_up_to_tick(WVWAP, syminfo.mintick)
-
 plot(timeframe.isintraday ? wvw : na, title='W-VWAP', color=show_WVWAPs_color)
 var label wVWAPLabel = na
-wVWAPLabel := label.new(timenow, timeframe.isintraday ? wvw : na, xloc=xloc.bar_time, text=PriceLocation + 'W-VWAP -   ' + str.tostring(timeframe.isintraday ? wvw : na), color=show_WVWAPs_color, textcolor=show_WVWAPs_text, style=NoLabelOption, size=LabelSize)
+wVWAPLabel := label.new(timenow, timeframe.isintraday ? wvw : na, xloc=xloc.bar_time, text=PriceLocation + 'W - ' + str.tostring(timeframe.isintraday ? wvw : na), color=show_WVWAPs_color, textcolor=show_WVWAPs_text, style=NoLabelOption, size=LabelSize)
 label.delete(wVWAPLabel[1])
 
-
 //Monthly VWAP
-
 var float vwapsum = na
 var float volumesum = na
-
 newSession = ta.change(time('M'))
-
 vwapsum := newSession ? hl2 * volume : hl2 * volume + vwapsum[1]
 volumesum := newSession ? volume : volume + volumesum[1]
-
 MVWAP = vwapsum / volumesum
 mvw = f_round_up_to_tick(MVWAP, syminfo.mintick)
-
 plot(newSession ? na : mvw, title='M-VWAP', color=show_MVWAPs_color, style=plot.style_linebr)
 var label mVWAPLabel = na
-mVWAPLabel := label.new(timenow, timeframe.isintraday ? mvw : na, xloc=xloc.bar_time, text=PriceLocation + 'M-VWAP -   ' + str.tostring(timeframe.isintraday ? mvw : na), color=show_MVWAPs_color, textcolor=show_MVWAPs_text, style=NoLabelOption, size=LabelSize)
+mVWAPLabel := label.new(timenow, timeframe.isintraday ? mvw : na, xloc=xloc.bar_time, text=PriceLocation + 'M - ' + str.tostring(timeframe.isintraday ? mvw : na), color=show_MVWAPs_color, textcolor=show_MVWAPs_text, style=NoLabelOption, size=LabelSize)
 label.delete(mVWAPLabel[1])
 /////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////2D VWAP
-source = hlc3
-
-StartSun_session = na(time(timeframe.period, '0000-0000:7'))
-ShowMon_session = na(time(timeframe.period, '0000-0000:2'))
-
-SMsumSrc = source * volume
-SMsumVol = volume
-SMsumSrc := StartSun_session and not StartSun_session[1] ? SMsumSrc : SMsumSrc + SMsumSrc[1]
-SMsumVol := StartSun_session and not StartSun_session[1] ? SMsumVol : SMsumVol + SMsumVol[1]
-
-StartSun_condition = StartSun_session and not StartSun_session[1] ? na : StartSun_session and is_today ? SMsumSrc / SMsumVol : na
-
-plot(StartSun_condition and not ShowMon_session ? StartSun_condition : na, title='Sun-2DVWAP', color=show_48VWAPs_color, linewidth=2, style=plot.style_linebr)
-StartSunLabel = label.new(timenow, StartSun_condition and not ShowMon_session ? StartSun_condition : na, xloc=xloc.bar_time, text=PriceLocation1 + 'Sun-2DVWAP - ' + str.tostring(f_round_up_to_tick(StartSun_condition, syminfo.mintick)), color=show_48VWAPs_color, textcolor=show_48VWAPs_text, style=NoLabelOption, size=LabelSize)
-label.delete(StartSunLabel[1])
-
-
-//Monday Start 48 hour VWAP (Displays on Tuesday)
-StartMon_session = na(time(timeframe.period, '0000-0000:1'))
-ShowTues_session = na(time(timeframe.period, '0000-0000:3'))
-
-MTsumSrc = source * volume
-MTsumVol = volume
-MTsumSrc := StartMon_session and not StartMon_session[1] ? MTsumSrc : MTsumSrc + MTsumSrc[1]
-MTsumVol := StartMon_session and not StartMon_session[1] ? MTsumVol : MTsumVol + MTsumVol[1]
-
-StartMon_condition = StartMon_session and not StartMon_session[1] ? na : StartMon_session and is_today ? MTsumSrc / MTsumVol : na
-
-plot(StartMon_condition and not ShowTues_session ? StartMon_condition : na, title='Mon-2DVWAP', color=show_48VWAPs_color, linewidth=2, style=plot.style_linebr)
-StartMonLabel = label.new(timenow, StartMon_condition and not ShowTues_session ? StartMon_condition : na, xloc=xloc.bar_time, text=PriceLocation1 + 'Mon-2DVWAP - ' + str.tostring(f_round_up_to_tick(StartMon_condition, syminfo.mintick)), color=show_48VWAPs_color, textcolor=show_48VWAPs_text, style=NoLabelOption, size=LabelSize)
-label.delete(StartMonLabel[1])
-
-
-//Tuesday Start 48 hour VWAP (Displays on Wednesday)
-StartTues_session = na(time(timeframe.period, '0000-0000:2'))
-ShowWeds_session = na(time(timeframe.period, '0000-0000:4'))
-
-TWsumSrc = source * volume
-TWsumVol = volume
-TWsumSrc := StartTues_session and not StartTues_session[1] ? TWsumSrc : TWsumSrc + TWsumSrc[1]
-TWsumVol := StartTues_session and not StartTues_session[1] ? TWsumVol : TWsumVol + TWsumVol[1]
-
-StartTues_condition = StartTues_session and not StartTues_session[1] ? na : StartTues_session and is_today ? TWsumSrc / TWsumVol : na
-
-plot(StartTues_condition and not ShowWeds_session ? StartTues_condition : na, title='Tues-2DVWAP', color=show_48VWAPs_color, linewidth=2, style=plot.style_linebr)
-StartTuesLabel = label.new(timenow, StartTues_condition and not ShowWeds_session ? StartTues_condition : na, xloc=xloc.bar_time, text=PriceLocation1 + 'Tues-2DVWAP - ' + str.tostring(f_round_up_to_tick(StartTues_condition, syminfo.mintick)), color=show_48VWAPs_color, textcolor=show_48VWAPs_text, style=NoLabelOption, size=LabelSize)
-label.delete(StartTuesLabel[1])
-
-//Wednesday Start 48 hour VWAP (Displays on Thursday)
-StartWeds_session = na(time(timeframe.period, '0000-0000:3'))
-ShowThurs_session = na(time(timeframe.period, '0000-0000:5'))
-
-WTsumSrc = source * volume
-WTsumVol = volume
-WTsumSrc := StartWeds_session and not StartWeds_session[1] ? WTsumSrc : WTsumSrc + WTsumSrc[1]
-WTsumVol := StartWeds_session and not StartWeds_session[1] ? WTsumVol : WTsumVol + WTsumVol[1]
-
-StartWeds_condition = StartWeds_session and not StartWeds_session[1] ? na : StartWeds_session and is_today ? WTsumSrc / WTsumVol : na
-
-plot(StartWeds_condition and not ShowThurs_session ? StartWeds_condition : na, title='Weds-2DVWAP', color=show_48VWAPs_color, linewidth=2, style=plot.style_linebr)
-StartWedsLabel = label.new(timenow, StartWeds_condition and not ShowThurs_session ? StartWeds_condition : na, xloc=xloc.bar_time, text=PriceLocation1 + 'Weds-2DVWAP - ' + str.tostring(f_round_up_to_tick(StartWeds_condition, syminfo.mintick)), color=show_48VWAPs_color, textcolor=show_48VWAPs_text, style=NoLabelOption, size=LabelSize)
-label.delete(StartWedsLabel[1])
-
-
-//Thursday Start 48 hour VWAP (Displays on Friday)
-StartThurs_session = na(time(timeframe.period, '0000-0000:4'))
-ShowFri_session = na(time(timeframe.period, '0000-0000:6'))
-
-TFsumSrc = source * volume
-TFsumVol = volume
-TFsumSrc := StartThurs_session and not StartThurs_session[1] ? TFsumSrc : TFsumSrc + TFsumSrc[1]
-TFsumVol := StartThurs_session and not StartThurs_session[1] ? TFsumVol : TFsumVol + TFsumVol[1]
-
-StartThurs_condition = StartThurs_session and not StartThurs_session[1] ? na : StartThurs_session and is_today ? TFsumSrc / TFsumVol : na
-
-plot(StartThurs_condition and not ShowFri_session ? StartThurs_condition : na, title='Thurs-2DVWAP', color=show_48VWAPs_color, linewidth=2, style=plot.style_linebr)
-StartThursLabel = label.new(timenow, StartThurs_condition and not ShowFri_session ? StartThurs_condition : na, xloc=xloc.bar_time, text=PriceLocation1 + 'Thurs-2DVWAP - ' + str.tostring(f_round_up_to_tick(StartThurs_condition, syminfo.mintick)), color=show_48VWAPs_color, textcolor=show_48VWAPs_text, style=NoLabelOption, size=LabelSize)
-label.delete(StartThursLabel[1])
-
-//Friday Start 48 hour VWAP (Displays on Saturday)
-StartFri_session = na(time(timeframe.period, '0000-0000:5'))
-ShowSat_session = na(time(timeframe.period, '0000-0000:7'))
-
-FSsumSrc = source * volume
-FSsumVol = volume
-FSsumSrc := StartFri_session and not StartFri_session[1] ? FSsumSrc : FSsumSrc + FSsumSrc[1]
-FSsumVol := StartFri_session and not StartFri_session[1] ? FSsumVol : FSsumVol + FSsumVol[1]
-
-StartFri_condition = StartFri_session and not StartFri_session[1] ? na : StartFri_session and is_today ? FSsumSrc / FSsumVol : na
-
-plot(StartFri_condition and not ShowSat_session ? StartFri_condition : na, title='Fri-2DVWAP', color=show_48VWAPs_color, linewidth=2, style=plot.style_linebr)
-StartFriLabel = label.new(timenow, StartFri_condition and not ShowSat_session ? StartFri_condition : na, xloc=xloc.bar_time, text=PriceLocation1 + 'Fri-2DVWAP - ' + str.tostring(f_round_up_to_tick(StartFri_condition, syminfo.mintick)), color=show_48VWAPs_color, textcolor=show_48VWAPs_text, style=NoLabelOption, size=LabelSize)
-label.delete(StartFriLabel[1])
-
-
-//Saturday Start 48 hour VWAP (Displays on Sunday)
-StartSat_session = na(time(timeframe.period, '0000-0000:6'))
-ShowSun_session = na(time(timeframe.period, '0000-0000:1'))
-
-
-SSsumSrc = source * volume
-SSsumVol = volume
-SSsumSrc := StartSat_session and not StartSat_session[1] ? SSsumSrc : SSsumSrc + SSsumSrc[1]
-SSsumVol := StartSat_session and not StartSat_session[1] ? SSsumVol : SSsumVol + SSsumVol[1]
-
-StartSat_condition = StartSat_session and not StartSat_session[1] ? na : StartSat_session and is_today ? SSsumSrc / SSsumVol : na
-
-plot(StartSat_condition and not ShowSun_session ? StartSat_condition : na, title='Sat-2DVWAP', color=show_48VWAPs_color, linewidth=2, style=plot.style_linebr)
-StartSatLabel = label.new(timenow, StartSat_condition and not ShowSun_session ? StartSat_condition : na, xloc=xloc.bar_time, text=PriceLocation1 + 'Sat-2DVWAP - ' + str.tostring(f_round_up_to_tick(StartSat_condition, syminfo.mintick)), color=show_48VWAPs_color, textcolor=show_48VWAPs_text, style=NoLabelOption, size=LabelSize)
-label.delete(StartSatLabel[1])
-/////////////48 Hour End
-
 
 /////////24 HOUR ROLLING VWAP///////////////////////////////////////////
 
@@ -745,7 +579,7 @@ vwapValue_24_1 = cumulativeTypicalPriceVolume_24_1 / cumulativeVolume_24_1
 
 plot(vwapValue_24_1 and TF_24_1 ? vwapValue_24_1 : na, color=show_Live24VWAPs_color)
 var label vwapValueLabel_24_1 = na
-vwapValueLabel_24_1 := label.new(timenow, vwapValue_24_1 and TF_24_1 ? vwapValue_24_1 : na, xloc=xloc.bar_time, text=PriceLocation1 + 'Live 24 VWAP -   ' + str.tostring(f_round_up_to_tick(vwapValue_24_1, syminfo.mintick)), color=show_Live24VWAPs_color, textcolor=show_Live24VWAPs_text, style=NoLabelOption, size=LabelSize)
+vwapValueLabel_24_1 := label.new(timenow, vwapValue_24_1 and TF_24_1 ? vwapValue_24_1 : na, xloc=xloc.bar_time, text=PriceLocation1 + 'L-24 - ' + str.tostring(f_round_up_to_tick(vwapValue_24_1, syminfo.mintick)), color=show_Live24VWAPs_color, textcolor=show_Live24VWAPs_text, style=NoLabelOption, size=LabelSize)
 label.delete(vwapValueLabel_24_1[1])
 
 //VWAP 24 hour 5 min
@@ -762,7 +596,7 @@ vwapValue_24_5 = cumulativeTypicalPriceVolume_24_5 / cumulativeVolume_24_5
 
 plot(vwapValue_24_5 and TF_24_5 ? vwapValue_24_5 : na, color=show_Live24VWAPs_color)
 var label vwapValueLabel_24_5 = na
-vwapValueLabel_24_5 := label.new(timenow, vwapValue_24_5 and TF_24_5 ? vwapValue_24_5 : na, xloc=xloc.bar_time, text=PriceLocation1 + 'Live 24 VWAP -   ' + str.tostring(f_round_up_to_tick(vwapValue_24_5, syminfo.mintick)), color=show_Live24VWAPs_color, textcolor=show_Live24VWAPs_text, style=NoLabelOption, size=LabelSize)
+vwapValueLabel_24_5 := label.new(timenow, vwapValue_24_5 and TF_24_5 ? vwapValue_24_5 : na, xloc=xloc.bar_time, text=PriceLocation1 + 'L-24 - ' + str.tostring(f_round_up_to_tick(vwapValue_24_5, syminfo.mintick)), color=show_Live24VWAPs_color, textcolor=show_Live24VWAPs_text, style=NoLabelOption, size=LabelSize)
 label.delete(vwapValueLabel_24_5[1])
 
 //VWAP 24 hour 15 min
@@ -779,9 +613,8 @@ vwapValue_24_15 = cumulativeTypicalPriceVolume_24_15 / cumulativeVolume_24_15
 
 plot(vwapValue_24_15 and TF_24_15 ? vwapValue_24_15 : na, color=show_Live24VWAPs_color)
 var label vwapValueLabel_24_15 = na
-vwapValueLabel_24_15 := label.new(timenow, vwapValue_24_15 and TF_24_15 ? vwapValue_24_15 : na, xloc=xloc.bar_time, text=PriceLocation1 + 'Live 24 VWAP -   ' + str.tostring(f_round_up_to_tick(vwapValue_24_15, syminfo.mintick)), color=show_Live24VWAPs_color, textcolor=show_Live24VWAPs_text, style=NoLabelOption, size=LabelSize)
+vwapValueLabel_24_15 := label.new(timenow, vwapValue_24_15 and TF_24_15 ? vwapValue_24_15 : na, xloc=xloc.bar_time, text=PriceLocation1 + 'L-24 - ' + str.tostring(f_round_up_to_tick(vwapValue_24_15, syminfo.mintick)), color=show_Live24VWAPs_color, textcolor=show_Live24VWAPs_text, style=NoLabelOption, size=LabelSize)
 label.delete(vwapValueLabel_24_15[1])
-
 
 ///////////////////////////////
 
@@ -794,11 +627,9 @@ pmOpen = request.security(syminfo.tickerid, 'M', open[1], lookahead=barmerge.loo
 pmHigh = request.security(syminfo.tickerid, 'M', high[1], lookahead=barmerge.lookahead_on)
 pmLow = request.security(syminfo.tickerid, 'M', low[1], lookahead=barmerge.lookahead_on)
 
-
 //Weekly Open
 wOpen = request.security(syminfo.tickerid, 'W', open, lookahead=barmerge.lookahead_on)
 pwOpen = request.security(syminfo.tickerid, 'W', open[1], lookahead=barmerge.lookahead_on)
-
 
 //Previous Day Open High Low
 dOpen = request.security(syminfo.tickerid, 'D', open, lookahead=barmerge.lookahead_on)
@@ -824,31 +655,28 @@ Yesterday := Today
 DailyHigh := CheckDay or high > DailyHigh ? high[0] : DailyHigh
 DailyLow := CheckDay or low < DailyLow ? low[0] : DailyLow
 
-
-
 /// Input to show Lines and Labels for right of price in reference to the above
 ExtendAxisLine = input.bool(false, title='Extend Axis value lines across chart', group='Daily, Weekly, Monthly, EQ Price Axis', tooltip='-d = Daily, w = Weekly, m = Monthly, p = Previous, dby = Day Before Yesterday')
 
 ExtendOption = ExtendAxisLine ? extend.both : extend.right
 
 PriceDaily = input.bool(true, title='- pdHigh - pdLow - pdEQ', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Daily 1')
-showdOpen = input.bool(false, title='- dOpen', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Daily')
+showdOpen = input.bool(true, title='- dOpen', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Daily')
 showdLow = input.bool(false, title='- dLow', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Daily')
 showdHigh = input.bool(false, title='- dHigh', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Daily')
-showpdOpen = input.bool(false, title='- pdOpen', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Daily')
+showpdOpen = input.bool(true, title='- pdOpen', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Daily')
 showdbyOpen = input.bool(false, title='- dbyOpen', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Daily')
 
-PriceWeekly = input.bool(true, title='- pwEQ', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Weekly')
-showwOpen = input.bool(false, title='- wOpen', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Weekly')
-showpwOpen = input.bool(false, title='- pwOpen', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Weekly')
+PriceWeekly = input.bool(false, title='- pwEQ', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Weekly')
+showwOpen = input.bool(true, title='- wOpen', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Weekly')
+showpwOpen = input.bool(true, title='- pwOpen', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Weekly')
 showpwHigh = input.bool(false, title='- pwHigh', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Weekly')
 showpwLow = input.bool(false, title='- pwLow', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Weekly')
 
-showpmOpen = input.bool(false, title='- mOpen', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Monthly')
-showmOpen = input.bool(false, title='- pmOpen', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Monthly')
+showpmOpen = input.bool(true, title='- mOpen', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Monthly')
+showmOpen = input.bool(true, title='- pmOpen', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Monthly')
 showpmHigh = input.bool(false, title='- pmHigh', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Monthly')
 showpmLow = input.bool(false, title='- pmLow', group='Daily, Weekly, Monthly, EQ Price Axis', inline='Monthly')
-
 
 // Line Var
 var line pmHighLine = na
@@ -869,8 +697,6 @@ var line pwEQLine = na
 var line dLowLine = na
 var line dHighLine = na
 
-
-
 //Label Var
 var label pmHighLabel = na
 var label pmLowLabel = na
@@ -890,7 +716,6 @@ var label pwEQLabel = na
 var label dLowLabel = na
 var label dHighLabel = na
 
-
 //Create Line
 if PriceDaily
 
@@ -899,9 +724,9 @@ if PriceDaily
     pdEQLine := line.new(bar_index[1], pdEQ, bar_index, pdEQ, color=DanCCDailyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
 
 //Create Label
-    pdHighLabel := label.new(bar_index, pdHigh, text='                                                                                              pdHigh - ' + str.tostring(pdHigh), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
-    pdLowLabel := label.new(bar_index, pdLow, text='                                                                                                pdLow - ' + str.tostring(pdLow), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
-    pdEQLabel := label.new(bar_index, pdEQ, text='                                                                                                  pdEQ - ' + str.tostring(pdEQ), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+    pdHighLabel := label.new(bar_index, pdHigh, text='          pdH - ' + str.tostring(pdHigh), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+    pdLowLabel := label.new(bar_index, pdLow, text='          pdL - ' + str.tostring(pdLow), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+    pdEQLabel := label.new(bar_index, pdEQ, text='          pdEQ - ' + str.tostring(pdEQ), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
 
 //Delete Line
     line.delete(pdHighLine[1])
@@ -913,12 +738,11 @@ if PriceDaily
     label.delete(pdLowLabel[1])
     label.delete(pdEQLabel[1])
 
-
 /////////////////////Weekly
 if PriceWeekly
     pwEQLine := line.new(bar_index[1], pwEQ, bar_index, pwEQ, color=DanCCWeeklyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
 //Create Label
-    pwEQLabel := label.new(bar_index, pwEQ, text='                                                                                                                                                           pwEQ - ' + str.tostring(pwEQ), color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+    pwEQLabel := label.new(bar_index, pwEQ, text='          pwEQ - ' + str.tostring(pwEQ), color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 //Delete Line
     line.delete(pwEQLine[1])
 //Delete Label    
@@ -930,10 +754,9 @@ if showpwHigh
 //Delete Line
     line.delete(pwHighLine[1])
 //Create Label
-    pwHighLabel := label.new(bar_index, pwHigh, text='                                                                                                                                                           pwHigh - ' + str.tostring(pwHigh), color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+    pwHighLabel := label.new(bar_index, pwHigh, text='          pwH - ' + str.tostring(pwHigh), color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 //Delete Label    
     label.delete(pwHighLabel[1])
-
 
 //Create Line
 if showpwLow
@@ -941,18 +764,15 @@ if showpwLow
 //Delete Line
     line.delete(pwLowLine[1])
 //Create Label
-    pwLowLabel := label.new(bar_index, pwLow, text='                                                                                                                                                           pwLow - ' + str.tostring(pwLow), color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+    pwLowLabel := label.new(bar_index, pwLow, text='          pwL - ' + str.tostring(pwLow), color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 //Delete Label    
     label.delete(pwLowLabel[1])
-
-
-
 
 ////////////////////Monthly
 if showmOpen
     mOpenLine := line.new(bar_index[1], mOpen, bar_index, mOpen, color=DanCCMonthlyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
 //Create Label
-    mOpenLabel := label.new(bar_index, mOpen, text='                                                                                                                                                                                                                      mOpen - ' + str.tostring(mOpen), color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+    mOpenLabel := label.new(bar_index, mOpen, text='          mOpen - ' + str.tostring(mOpen), color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 //Delete Line
     line.delete(mOpenLine[1])
 //Delete Label    
@@ -961,7 +781,7 @@ if showmOpen
 if showpmOpen
     pmOpenLine := line.new(bar_index[1], pmOpen, bar_index, pmOpen, color=DanCCMonthlyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
 //Create Label
-    pmOpenLabel := label.new(bar_index, pmOpen, text='                                                                                                                                                                                                                      pmOpen - ' + str.tostring(pmOpen), color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+    pmOpenLabel := label.new(bar_index, pmOpen, text='          pmOpen - ' + str.tostring(pmOpen), color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 //Delete Line
     line.delete(pmOpenLine[1])
 //Delete Label    
@@ -973,11 +793,9 @@ if showpmHigh
 //Delete Line
     line.delete(pmHighLine[1])
 //Create Label
-    pmHighLabel := label.new(bar_index, pmHigh, text='                                                                                                                                                                                                                      pmHigh - ' + str.tostring(pmHigh), color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+    pmHighLabel := label.new(bar_index, pmHigh, text='          pmHigh - ' + str.tostring(pmHigh), color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 //Delete Label    
     label.delete(pmHighLabel[1])
-
-
 
 //Create Line
 if showpmLow
@@ -985,56 +803,51 @@ if showpmLow
 //Delete Line
     line.delete(pmLowLine[1])
 //Create Label
-    pmLowLabel := label.new(bar_index, pmLow, text='                                                                                                                                                                                                                      pmLow - ' + str.tostring(pmLow), color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+    pmLowLabel := label.new(bar_index, pmLow, text='          pmLow - ' + str.tostring(pmLow), color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 //Delete Label    
     label.delete(pmLowLabel[1])
-
-
 
 /////////Optional Levels
 
 if showdOpen
     dOpenLine := line.new(bar_index[1], dOpen, bar_index, dOpen, color=DanCCDailyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
-    dOpenLabel := label.new(bar_index, dOpen, text='                                                                                              dOpen - ' + str.tostring(dOpen), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+    dOpenLabel := label.new(bar_index, dOpen, text='          dO - ' + str.tostring(dOpen), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
     line.delete(dOpenLine[1])
     label.delete(dOpenLabel[1])
 
-
-
 if showdbyOpen
     dbyOpenLine := line.new(bar_index[1], dbyOpen, bar_index, dbyOpen, color=DanCCDailyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
-    dbyOpenLabel := label.new(bar_index, dbyOpen, text='                                                                                              dbyOpen - ' + str.tostring(dbyOpen), color=DanCCDailyInputColor, textcolor=color.blue, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+    dbyOpenLabel := label.new(bar_index, dbyOpen, text='          dbyO - ' + str.tostring(dbyOpen), color=DanCCDailyInputColor, textcolor=color.blue, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
     line.delete(dbyOpenLine[1])
     label.delete(dbyOpenLabel[1])
 
 if showpdOpen
     pdOpenLine := line.new(bar_index[1], pdOpen, bar_index, pdOpen, color=DanCCDailyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
-    pdOpenLabel := label.new(bar_index, pdOpen, text='                                                                                              pdOpen - ' + str.tostring(pdOpen), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+    pdOpenLabel := label.new(bar_index, pdOpen, text='          pdO - ' + str.tostring(pdOpen), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
     line.delete(pdOpenLine[1])
     label.delete(pdOpenLabel[1])
 
 if showwOpen
     wOpenLine := line.new(bar_index[1], wOpen, bar_index, wOpen, color=DanCCWeeklyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
-    wOpenLabel := label.new(bar_index, wOpen, text='                                                                                                                                                           wOpen - ' + str.tostring(wOpen), color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+    wOpenLabel := label.new(bar_index, wOpen, text='          wO - ' + str.tostring(wOpen), color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
     line.delete(wOpenLine[1])
     label.delete(wOpenLabel[1])
 
 if showpwOpen
     pwOpenLine := line.new(bar_index[1], pwOpen, bar_index, pwOpen, color=DanCCWeeklyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
-    pwOpenLabel := label.new(bar_index, pwOpen, text='                                                                                                                                                           pwOpen - ' + str.tostring(pwOpen), color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+    pwOpenLabel := label.new(bar_index, pwOpen, text='          pwO - ' + str.tostring(pwOpen), color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
     line.delete(pwOpenLine[1])
     label.delete(pwOpenLabel[1])
 
-
 if showdLow
     dLowLine := line.new(bar_index[1], DailyLow, bar_index, DailyLow, color=color.white, style=line.style_solid, width=1, extend=ExtendOption)
-    dLowLabel := label.new(bar_index, DailyLow, text='                                                                                              dLow - ' + str.tostring(DailyLow), color=color.white, textcolor=color.white, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+    dLowLabel := label.new(bar_index, DailyLow, text='          dL - ' + str.tostring(DailyLow), color=color.white, textcolor=color.white, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
     line.delete(dLowLine[1])
     label.delete(dLowLabel[1])
 
 if showdHigh
     dHighLine := line.new(bar_index[1], DailyHigh, bar_index, DailyHigh, color=color.white, style=line.style_solid, width=1, extend=ExtendOption)
-    dHighLabel := label.new(bar_index, DailyHigh, text='                                                                                              dHigh - ' + str.tostring(DailyHigh), color=color.white, textcolor=color.white, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+    dHighLabel := label.new(bar_index, DailyHigh, text='          dH - ' + str.tostring(DailyHigh), color=color.white, textcolor=color.white, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
     line.delete(dHighLine[1])
     label.delete(dHighLabel[1])
 
