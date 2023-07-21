@@ -1,5 +1,5 @@
 //@version=5
-indicator(title='NPOC | Range&Blocks | NYOpens | Weekendicator', shorttitle="Abbas1" overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
+indicator(title='NPOC | Range&Blocks | NYOpens | Weekendicator', shorttitle="Abbas1", overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
 
 bool        msb_sv          = input.bool        (false,                           title='Plot MSB lines')
 bool        box_sv          = input.bool        (false,                           title='Plot Orderblocks')
@@ -62,9 +62,9 @@ string      alert           = na
 //weekendicator
 multiplier = input.float(3, minval=0, maxval=10, step=0.1, group = "Weekend")
 
-day_clr = dayofweek < 2 or dayofweek > 6 ? color.new(#9598a1, 55) : color.new(#9598a1, 100)
+day_clr = dayofweek < 2 or dayofweek > 6 ? color.new(#9598a1, 80) : color.new(#9598a1, 100)
 plot(((high / low) * ohlc4) * (1 + multiplier / 100), style=plot.style_line, color=day_clr)
-plot(((low / high) * ohlc4) * (1 - multiplier / 100), style=plot.style_line, color=day_clr)
+plot(((low / high) * ohlc4) * (1 - multiplier / 100), style=plot.style_area, color=day_clr)
 
 //npoc chart champs
 show_nPOCs = input.bool(true, title='Show Naked POCs', group='Naked Point of Control Settings')
