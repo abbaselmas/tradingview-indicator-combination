@@ -1,9 +1,9 @@
 //@version=5
 indicator(title='NPOC | Range&Blocks | NYOpens | Weekendicator', shorttitle="Abbas1", overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
 
-bool        msb_sv          = input.bool        (false,                           title='Plot MSB lines')
-bool        box_sv          = input.bool        (false,                           title='Plot Orderblocks')
-bool        m_sv            = input.bool        (false,                          title='Plot Breakerblocks')
+bool        msb_sv          = input.bool        (true,                           title='Plot MSB lines')
+bool        box_sv          = input.bool        (true,                           title='Plot Orderblocks')
+bool        m_sv            = input.bool        (true,                          title='Plot Breakerblocks')
 bool        range_sv        = input.bool        (true,                           title='Plot Range')
 bool        range_eq_sv     = input.bool        (true,                           title='Plot Range 0.5 Line')
 bool        range_q_sv      = input.bool        (true,                           title='Plot Range 0.25 and 0.75 Lines')
