@@ -1,5 +1,5 @@
 //@version=5
-indicator(title='NPOC | Range&Blocks | NYOpens | Weekendicator', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
+indicator(title='NPOC | Range&Blocks | NYOpens | Weekendicator', shorttitle="Abbas1" overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
 
 bool        msb_sv          = input.bool        (false,                           title='Plot MSB lines')
 bool        box_sv          = input.bool        (false,                           title='Plot Orderblocks')
