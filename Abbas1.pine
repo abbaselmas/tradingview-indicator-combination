@@ -7,12 +7,12 @@ bool        m_sv            = input.bool        (true,                          
 bool        range_sv        = input.bool        (true,                           title='Plot Range')
 bool        range_eq_sv     = input.bool        (true,                           title='Plot Range 0.5 Line')
 bool        range_q_sv      = input.bool        (true,                           title='Plot Range 0.25 and 0.75 Lines')
-color       u_s             = input.color       (color.new(#089981, 70),         title='Untested Supply Color')
-color       t_s             = input.color       (color.new(#b2b5be, 70),         title='Tested Supply Color')
-color       u_d             = input.color       (color.new(#f23645, 70),         title='Untested Demand Color')
-color       t_d             = input.color       (color.new(#b2b5be, 70),         title='Tested Demand Color')
-color       u_b             = input.color       (color.new(#ff9800, 70),         title='Untested Breaker Color')
-color       t_b             = input.color       (color.new(#b2b5be, 70),         title='Tested Breaker Color')
+color       u_s             = input.color       (color.new(#089981, 80),         title='Untested Supply Color')
+color       t_s             = input.color       (color.new(#b2b5be, 80),         title='Tested Supply Color')
+color       u_d             = input.color       (color.new(#f23645, 80),         title='Untested Demand Color')
+color       t_d             = input.color       (color.new(#b2b5be, 80),         title='Tested Demand Color')
+color       u_b             = input.color       (color.new(#ff9800, 80),         title='Untested Breaker Color')
+color       t_b             = input.color       (color.new(#b2b5be, 80),         title='Tested Breaker Color')
 
 var float[] pvh1_price      = array.new_float   (30, na)            // high
 var int[]   pvh1_time       = array.new_int     (30, na)
