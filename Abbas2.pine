@@ -234,9 +234,9 @@ if PriceDaily
 	pdEQLine := line.new(bar_index[1], pdEQ, bar_index, pdEQ, color=DanCCDailyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
 
 //Create Label
-	pdHighLabel := label.new(bar_index, pdHigh, text='                                                                                              pdHigh - ' + str.tostring(pdHigh), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
-	pdLowLabel := label.new(bar_index, pdLow, text='                                                                                                pdLow - ' + str.tostring(pdLow), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
-	pdEQLabel := label.new(bar_index, pdEQ, text='                                                                                                  pdEQ - ' + str.tostring(pdEQ), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+	pdHighLabel := label.new(bar_index, pdHigh, text='                                                                                              pdHigh', color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+	pdLowLabel := label.new(bar_index, pdLow, text='                                                                                                pdLow', color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+	pdEQLabel := label.new(bar_index, pdEQ, text='                                                                                                  pdEQ', color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
 
 //Delete Line
 	line.delete(pdHighLine[1])
@@ -274,7 +274,7 @@ if showpwLow
 //Delete Line
 	line.delete(pwLowLine[1])
 //Create Label
-	pwLowLabel := label.new(bar_index, pwLow, text='                                                                                                                                                           pwLow - ' + str.tostring(pwLow), color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+	pwLowLabel := label.new(bar_index, pwLow, text='                                                                                                                                                           pwLow', color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 //Delete Label    
 	label.delete(pwLowLabel[1])
 
@@ -282,7 +282,7 @@ if showpwLow
 if showmOpen
 	mOpenLine := line.new(bar_index[1], mOpen, bar_index, mOpen, color=DanCCMonthlyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
 //Create Label
-	mOpenLabel := label.new(bar_index, mOpen, text='                                                                                                                                                                                                                      mOpen - ' + str.tostring(mOpen), color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+	mOpenLabel := label.new(bar_index, mOpen, text='                                                                                                                                                     mOpen', color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 //Delete Line
 	line.delete(mOpenLine[1])
 //Delete Label    
@@ -291,7 +291,7 @@ if showmOpen
 if showpmOpen
 	pmOpenLine := line.new(bar_index[1], pmOpen, bar_index, pmOpen, color=DanCCMonthlyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
 //Create Label
-	pmOpenLabel := label.new(bar_index, pmOpen, text='                                                                                                                                                                                                                      pmOpen - ' + str.tostring(pmOpen), color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+	pmOpenLabel := label.new(bar_index, pmOpen, text='                                                                                                                              pmOpen', color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 //Delete Line
 	line.delete(pmOpenLine[1])
 //Delete Label    
@@ -303,7 +303,7 @@ if showpmHigh
 //Delete Line
 	line.delete(pmHighLine[1])
 //Create Label
-	pmHighLabel := label.new(bar_index, pmHigh, text='                                                                                                                                                                                                                      pmHigh - ' + str.tostring(pmHigh), color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+	pmHighLabel := label.new(bar_index, pmHigh, text='                                                                                                                                                                                                                      pmHigh', color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 //Delete Label    
 	label.delete(pmHighLabel[1])
 
@@ -313,7 +313,7 @@ if showpmLow
 //Delete Line
 	line.delete(pmLowLine[1])
 //Create Label
-	pmLowLabel := label.new(bar_index, pmLow, text='                                                                                                                                                                                                                      pmLow - ' + str.tostring(pmLow), color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+	pmLowLabel := label.new(bar_index, pmLow, text='                                                                                                                                                                                                                      pmLow', color=DanCCMonthlyInputColor, textcolor=DanCCMonthlyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 //Delete Label    
 	label.delete(pmLowLabel[1])
 
@@ -321,42 +321,42 @@ if showpmLow
 
 if showdOpen
 	dOpenLine := line.new(bar_index[1], dOpen, bar_index, dOpen, color=DanCCDailyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
-	dOpenLabel := label.new(bar_index, dOpen, text='                                                                                              dOpen - ' + str.tostring(dOpen), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+	dOpenLabel := label.new(bar_index, dOpen, text='                                                                                  dOpen', color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
 	line.delete(dOpenLine[1])
 	label.delete(dOpenLabel[1])
 
 if showdbyOpen
 	dbyOpenLine := line.new(bar_index[1], dbyOpen, bar_index, dbyOpen, color=DanCCDailyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
-	dbyOpenLabel := label.new(bar_index, dbyOpen, text='                                                                                              dbyOpen - ' + str.tostring(dbyOpen), color=DanCCDailyInputColor, textcolor=color.blue, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+	dbyOpenLabel := label.new(bar_index, dbyOpen, text='                                                                                              dbyOpen', color=DanCCDailyInputColor, textcolor=color.blue, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
 	line.delete(dbyOpenLine[1])
 	label.delete(dbyOpenLabel[1])
 
 if showpdOpen
 	pdOpenLine := line.new(bar_index[1], pdOpen, bar_index, pdOpen, color=DanCCDailyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
-	pdOpenLabel := label.new(bar_index, pdOpen, text='                                                                                              pdOpen - ' + str.tostring(pdOpen), color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+	pdOpenLabel := label.new(bar_index, pdOpen, text='                                                              pdOpen', color=DanCCDailyInputColor, textcolor=DanCCDailyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
 	line.delete(pdOpenLine[1])
 	label.delete(pdOpenLabel[1])
 
 if showwOpen
 	wOpenLine := line.new(bar_index[1], wOpen, bar_index, wOpen, color=DanCCWeeklyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
-	wOpenLabel := label.new(bar_index, wOpen, text='                                                                                                                                                           wOpen - ' + str.tostring(wOpen), color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+	wOpenLabel := label.new(bar_index, wOpen, text='                                                                                                                               wOpen', color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 	line.delete(wOpenLine[1])
 	label.delete(wOpenLabel[1])
 
 if showpwOpen
 	pwOpenLine := line.new(bar_index[1], pwOpen, bar_index, pwOpen, color=DanCCWeeklyInputColor, style=line.style_dashed, width=1, extend=ExtendOption)
-	pwOpenLabel := label.new(bar_index, pwOpen, text='                                                                                                                                                           pwOpen - ' + str.tostring(pwOpen), color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
+	pwOpenLabel := label.new(bar_index, pwOpen, text='                                                                                                       pwOpen', color=DanCCWeeklyInputColor, textcolor=DanCCWeeklyInputColor, style=label.style_none, size=size.normal, xloc=xloc.bar_index)
 	line.delete(pwOpenLine[1])
 	label.delete(pwOpenLabel[1])
 
 if showdLow
 	dLowLine := line.new(bar_index[1], DailyLow, bar_index, DailyLow, color=color.white, style=line.style_solid, width=1, extend=ExtendOption)
-	dLowLabel := label.new(bar_index, DailyLow, text='                                                                                              dLow - ' + str.tostring(DailyLow), color=color.white, textcolor=color.white, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+	dLowLabel := label.new(bar_index, DailyLow, text='                                                                              dLow', color=color.white, textcolor=color.white, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
 	line.delete(dLowLine[1])
 	label.delete(dLowLabel[1])
 
 if showdHigh
 	dHighLine := line.new(bar_index[1], DailyHigh, bar_index, DailyHigh, color=color.white, style=line.style_solid, width=1, extend=ExtendOption)
-	dHighLabel := label.new(bar_index, DailyHigh, text='                                                                                              dHigh - ' + str.tostring(DailyHigh), color=color.white, textcolor=color.white, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
+	dHighLabel := label.new(bar_index, DailyHigh, text='                                                                              dHigh', color=color.white, textcolor=color.white, style=label.style_none, size=size.normal, xloc=xloc.bar_index, textalign=text.align_right)
 	line.delete(dHighLine[1])
 	label.delete(dHighLabel[1])
