@@ -151,7 +151,7 @@ p_poc := is_new_bar(dtf) ? d_poc[1] : p_poc[1]
 var line[] uplines = array.new_line()
 var float[] uppocs = array.new_float()
 
-if is_new_bar(dtf)
+if is_new_bar(dtf) and show_nPOCs
 	array.push(uplines, line.new(time, p_poc, time + 1, p_poc, xloc=xloc.bar_time, color=show_nPOCs_color, extend=extend.right))
 	array.push(uppocs, p_poc)
 
@@ -164,7 +164,7 @@ if array.size(uppocs) > 0
 var line[] downlines = array.new_line()
 var float[] downpocs = array.new_float()
 
-if is_new_bar(dtf)
+if is_new_bar(dtf) and show_nPOCs
 	array.push(downlines, line.new(time, p_poc, time + 1, p_poc, xloc=xloc.bar_time, color=show_nPOCs_color, extend=extend.right))
 	array.push(downpocs, p_poc)
 
