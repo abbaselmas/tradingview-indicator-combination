@@ -1,5 +1,5 @@
 //@version=5
-indicator(title='VP-Period', shorttitle='Abbas3', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
+indicator(title='BPR+nPOCs', shorttitle='Abbas3', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
 
 var bool is_first_candle= true
 var diff = 0.0
@@ -242,3 +242,112 @@ else if not na(box_bearish) and high > box.get_top(box_bearish)
         box.delete(box_bearish)
     else
         box_bearish := na
+
+//npoc chart champs
+show_nPOCs = input.bool(true, title='Show Naked POCs', group='Naked Point of Control Settings')
+dtf = input.timeframe('D', title='nPOC - Time Frame', group='Naked Point of Control Settings')
+symbol_resolution = input.float(1, title='Resolution (Change resolution to Symbol decimal)', group='Symbol Settings', tooltip='E.g. BTC = 1, APE = 0.01, OPTUSD = 0.0001')
+
+show_nPOCs_color = input.color(color.new(#F236BA, 10), title='nPOC - Color', group='Naked Point of Control Settings')
+
+is_new_bar(t) =>
+	ta.change(time(t)) != 0
+round_to_nearest(v, x) =>
+	math.round(v / x) * x
+
+tick_size = math.max(syminfo.mintick, symbol_resolution)
+
+var a = array.new_float(0)
+
+a_min = 0.0
+a_min := nz(a_min[1], round_to_nearest(low, tick_size))
+a_max = 0.0
+a_max := nz(a_max[1], round_to_nearest(high, tick_size))
+
+d_switch = is_new_bar(dtf)
+
+if d_switch
+	a_min := low
+	a_max := high
+	array.clear(a)
+
+// Scaled min max
+v_min = int(round_to_nearest(low - a_min, tick_size) / tick_size)
+v_max = int(round_to_nearest(high - a_min, tick_size) / tick_size)
+
+// Scaled candle range
+ticks = v_max - v_min
+
+vol = volume / (ticks == 0 ? 1 : ticks)
+
+for i = v_min to math.max(v_max - 1, v_min) by 1
+	// Insert new low value
+	if i < 0
+		array.insert(a, i - v_min, vol)
+		continue
+
+	// Adjust index
+	offset = v_min < 0 ? math.abs(v_min) : 0
+	index = int(i + offset)
+
+	// Push new high value
+	if index >= array.size(a)
+		array.push(a, vol)
+		continue
+
+	// Update existing value
+	v = array.get(a, index)
+	array.set(a, index, v + vol)
+
+// Array bounds
+a_min := math.min(a_min, round_to_nearest(low, tick_size))
+a_max := math.max(a_max, round_to_nearest(high, tick_size))
+a_size = array.size(a)
+
+// POC
+poc_index = -1
+poc_prev = -1.0
+sum_vol = 0.0
+
+for i = 0 to a_size - 1 by 1
+	poc_current = array.get(a, i)
+	sum_vol += poc_current
+
+	if poc_current > poc_prev
+		poc_prev := poc_current
+		poc_index := i
+		poc_index
+
+float p_poc = 0.0
+float d_poc = 0.0
+float b_poc = 0.0
+
+d_poc := poc_index * tick_size + a_min
+p_poc := is_new_bar(dtf) ? d_poc[1] : p_poc[1]
+
+var line[] uplines = array.new_line()
+var float[] uppocs = array.new_float()
+
+if is_new_bar(dtf) and show_nPOCs
+	array.push(uplines, line.new(time, p_poc, time + 1, p_poc, xloc=xloc.bar_time, color=show_nPOCs_color, extend=extend.right))
+	array.push(uppocs, p_poc)
+
+if array.size(uppocs) > 0
+	for i = 0 to array.size(uppocs) - 1 by 1
+		myuppoc = array.get(uppocs, i)
+		if myuppoc > low
+			line.delete(array.get(uplines, i))
+
+var line[] downlines = array.new_line()
+var float[] downpocs = array.new_float()
+
+if is_new_bar(dtf) and show_nPOCs
+	array.push(downlines, line.new(time, p_poc, time + 1, p_poc, xloc=xloc.bar_time, color=show_nPOCs_color, extend=extend.right))
+	array.push(downpocs, p_poc)
+
+if array.size(downpocs) > 0
+	for i = 0 to array.size(downpocs) - 1 by 1
+		mydownpoc = array.get(downpocs, i)
+		if mydownpoc < high
+			line.delete(array.get(downlines, i))
+///////////////////

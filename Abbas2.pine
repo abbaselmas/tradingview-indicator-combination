@@ -1,5 +1,5 @@
 //@version=5
-indicator(title='VWAPs | Opens', shorttitle='Abbas2', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
+indicator(title='CME gap', shorttitle='Abbas2', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
 
 //CME gap show and fill
 mode = input.string(
