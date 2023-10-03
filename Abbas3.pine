@@ -1,5 +1,5 @@
 //@version=5
-indicator(title='BPR+nPOCs', shorttitle='Abbas3', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
+indicator(title='BPR | nPOCs', shorttitle='Abbas3', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
 
 var bool is_first_candle= true
 var diff = 0.0
