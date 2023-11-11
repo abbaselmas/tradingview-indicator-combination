@@ -1,5 +1,5 @@
 //@version=5
-indicator(title='PVP | nPOCs', shorttitle='Abbas3', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
+indicator(title='PVP | nPOCs | Key Levels', shorttitle='Abbas3', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
 
 var bool is_first_candle= true
 var diff = 0.0
@@ -265,3 +265,611 @@ if array.size(downpocs) > 0
 		if mydownpoc < high
 			line.delete(array.get(downlines, i))
 ///////////////////
+
+//Key Levels
+///////////////////////////////////////////////////
+displayStyle = input.string(defval='Standard', title='Display Style', options=['Standard', 'Right Anchored'], inline='Display')
+mergebool = input.bool(defval=true, title='Merge Levels?', inline='Display')
+distanceright = input.int(defval=30, title='Distance', minval=5, maxval=500, inline='Dist')
+radistance = input.int(defval=250, title='Anchor Distance', minval=5, maxval=500, inline='Dist')
+labelsize = input.string(defval='Medium', title='Text Size', options=['Small', 'Medium', 'Large'])
+linesize = input.string(defval='Small', title='Line Width', options=['Small', 'Medium', 'Large'], inline='Line')
+linestyle = input.string(defval='Solid', title='Line Style', options=['Solid', 'Dashed', 'Dotted'], inline='Line')
+
+GlobalTextType = input.bool(defval=true, title='Global Text ShortHand', tooltip='Enable for shorthand text on all text')
+var globalcoloring = input.bool(defval=false, title='Global Coloring', tooltip='Enable for all color controls via one color', inline='GC')
+GlobalColor = input.color(title='', defval=color.white, inline='GC')
+//var show_tails = input(defval = false, title = "Always Show", type = input.bool)
+
+[daily_time, daily_open] = request.security(syminfo.tickerid, 'D', [time, open], lookahead=barmerge.lookahead_on)
+[dailyh_time, dailyh_open] = request.security(syminfo.tickerid, 'D', [time[1], high[1]], lookahead=barmerge.lookahead_on)
+[dailyl_time, dailyl_open] = request.security(syminfo.tickerid, 'D', [time[1], low[1]], lookahead=barmerge.lookahead_on)
+
+cdailyh_open = request.security(syminfo.tickerid, 'D', high, lookahead=barmerge.lookahead_on)
+cdailyl_open = request.security(syminfo.tickerid, 'D', low, lookahead=barmerge.lookahead_on)
+var monday_time = time
+var monday_high = high
+var monday_low = low
+
+[weekly_time, weekly_open] = request.security(syminfo.tickerid, 'W', [time, open], lookahead=barmerge.lookahead_on)
+[weeklyh_time, weeklyh_open] = request.security(syminfo.tickerid, 'W', [time[1], high[1]], lookahead=barmerge.lookahead_on)
+[weeklyl_time, weeklyl_open] = request.security(syminfo.tickerid, 'W', [time[1], low[1]], lookahead=barmerge.lookahead_on)
+
+[monthly_time, monthly_open] = request.security(syminfo.tickerid, 'M', [time, open], lookahead=barmerge.lookahead_on)
+[monthlyh_time, monthlyh_open] = request.security(syminfo.tickerid, 'M', [time[1], high[1]], lookahead=barmerge.lookahead_on)
+[monthlyl_time, monthlyl_open] = request.security(syminfo.tickerid, 'M', [time[1], low[1]], lookahead=barmerge.lookahead_on)
+
+[yearly_time, yearly_open] = request.security(syminfo.tickerid, '12M', [time, open], lookahead=barmerge.lookahead_on)
+[yearlyh_time, yearlyh_open] = request.security(syminfo.tickerid, '12M', [time, high], lookahead=barmerge.lookahead_on)
+[yearlyl_time, yearlyl_open] = request.security(syminfo.tickerid, '12M', [time, low], lookahead=barmerge.lookahead_on)
+
+[intra_time, intra_open] = request.security(syminfo.tickerid, '240', [time, open], lookahead=barmerge.lookahead_on)
+[intrah_time, intrah_open] = request.security(syminfo.tickerid, '240', [time[1], high[1]], lookahead=barmerge.lookahead_on)
+[intral_time, intral_open] = request.security(syminfo.tickerid, '240', [time[1], low[1]], lookahead=barmerge.lookahead_on)
+
+//------------------------------ Inputs -------------------------------
+var is_intra_enabled = input.bool(defval=false, title='Open', group='4H', inline='4H')
+var is_intrarange_enabled = input.bool(defval=false, title='Prev H/L', group='4H', inline='4H')
+var is_intram_enabled = input.bool(defval=false, title='Prev Mid', group='4H', inline='4H')
+IntraTextType = input.bool(defval=false, title='ShortHand', group='4H', inline='4Hsh')
+
+var is_daily_enabled = input.bool(defval=true, title='Open', group='Daily', inline='Daily')
+var is_dailyrange_enabled = input.bool(defval=false, title='Prev H/L', group='Daily', inline='Daily')
+var is_dailym_enabled = input.bool(defval=false, title='Prev Mid', group='Daily', inline='Daily')
+DailyTextType = input.bool(defval=false, title='ShortHand', group='Daily', inline='Dailysh')
+
+var is_monday_enabled = input.bool(defval=true, title='Range', group='Monday Range', inline='Monday')
+var is_monday_mid = input.bool(defval=true, title='Mid', group='Monday Range', inline='Monday')
+var untested_monday = false
+MondayTextType = input.bool(defval=false, title='ShortHand', group='Monday Range', inline='Mondaysh')
+
+var is_weekly_enabled = input.bool(defval=true, title='Open', group='Weekly', inline='Weekly')
+var is_weeklyrange_enabled = input.bool(defval=true, title='Prev H/L', group='Weekly', inline='Weekly')
+var is_weekly_mid = input.bool(defval=true, title='Prev Mid', group='Weekly', inline='Weekly')
+WeeklyTextType = input.bool(defval=false, title='ShortHand', group='Weekly', inline='Weeklysh')
+
+var is_monthly_enabled = input.bool(defval=false, title='Open', group='Monthly', inline='Monthly')
+var is_monthlyrange_enabled = input.bool(defval=false, title='Prev H/L', group='Monthly', inline='Monthly')
+var is_monthly_mid = input.bool(defval=false, title='Prev Mid', group='Monthly', inline='Monthly')
+MonthlyTextType = input.bool(defval=false, title='ShortHand', group='Monthly', inline='Monthlysh')
+
+var is_yearly_enabled = input.bool(defval=false, title='Open', group='Yearly', inline='Yearly')
+var is_yearlyrange_enabled = input.bool(defval=false, title='Current H/L', group='Yearly', inline='Yearly')
+var is_yearly_mid = input.bool(defval=false, title='Mid', group='Yearly', inline='Yearly')
+YearlyTextType = input.bool(defval=false, title='ShortHand', group='Yearly', inline='Yearlysh')
+
+DailyColor = input.color(title='', defval=color.aqua, group='Daily', inline='Dailysh')
+MondayColor = input.color(title='', defval=color.purple, group='Monday Range', inline='Mondaysh')
+WeeklyColor = input.color(title='', defval=color.orange, group='Weekly', inline='Weeklysh')
+MonthlyColor = input.color(title='', defval=color.teal, group='Monthly', inline='Monthlysh')
+YearlyColor = input.color(title='', defval=color.red, group='Yearly', inline='Yearlysh')
+IntraColor = input.color(title='', defval=color.orange, group='4H', inline='4Hsh')
+
+var pdhtext = GlobalTextType or DailyTextType ? 'PDH' : 'Prev Day High'
+var pdltext = GlobalTextType or DailyTextType ? 'PDL' : 'Prev Day Low'
+var dotext = GlobalTextType or DailyTextType ? 'DO' : 'Daily Open'
+var pdmtext = GlobalTextType or DailyTextType ? 'PDM' : 'Prev Day Mid'
+
+var pwhtext = GlobalTextType or WeeklyTextType ? 'PWH' : 'Prev Week High'
+var pwltext = GlobalTextType or WeeklyTextType ? 'PWL' : 'Prev Week Low'
+var wotext = GlobalTextType or WeeklyTextType ? 'WO' : 'Weekly Open'
+var pwmtext = GlobalTextType or WeeklyTextType ? 'PWM' : 'Prev Week Mid'
+
+var pmhtext = GlobalTextType or MonthlyTextType ? 'PMH' : 'Prev Month High'
+var pmltext = GlobalTextType or MonthlyTextType ? 'PML' : 'Prev Month Low'
+var motext = GlobalTextType or MonthlyTextType ? 'MO' : 'Monthly Open'
+var pmmtext = GlobalTextType or MonthlyTextType ? 'PMM' : 'Prev Month Mid'
+
+var cyhtext = GlobalTextType or YearlyTextType ? 'CYH' : 'Current Year High'
+var cyltext = GlobalTextType or YearlyTextType ? 'CYL' : 'Current Year Low'
+var yotext = GlobalTextType or YearlyTextType ? 'YO' : 'Yearly Open'
+var cymtext = GlobalTextType or YearlyTextType ? 'CYM' : 'Current Year Mid'
+
+var pihtext = GlobalTextType or IntraTextType ? 'P-4H-H' : 'Prev 4H High'
+var piltext = GlobalTextType or IntraTextType ? 'P-4H-L' : 'Prev 4H Low'
+var iotext = GlobalTextType or IntraTextType ? '4H-O' : '4H Open'
+var pimtext = GlobalTextType or IntraTextType ? 'P-4H-M' : 'Prev 4H Mid'
+
+var pmonhtext = GlobalTextType or MondayTextType ? 'MDAY-H' : 'Monday High'
+var pmonltext = GlobalTextType or MondayTextType ? 'MDAY-L' : 'Monday Low'
+var pmonmtext = GlobalTextType or MondayTextType ? 'MDAY-M' : 'Monday Mid'
+
+if globalcoloring == true
+    DailyColor := GlobalColor
+    MondayColor := GlobalColor
+    WeeklyColor := GlobalColor
+    MonthlyColor := GlobalColor
+    YearlyColor := GlobalColor
+    IntraColor := GlobalColor
+    IntraColor
+
+if weekly_time != weekly_time[1]
+    untested_monday := false
+    untested_monday
+
+if is_monday_enabled == true and untested_monday == false
+    untested_monday := true
+    monday_time := daily_time
+    monday_high := cdailyh_open
+    monday_low := cdailyl_open
+    monday_low
+
+linewidthint = 1
+if linesize == 'Small'
+    linewidthint := 1
+    linewidthint
+if linesize == 'Medium'
+    linewidthint := 2
+    linewidthint
+if linesize == 'Large'
+    linewidthint := 3
+    linewidthint
+
+var DEFAULT_LINE_WIDTH = linewidthint
+var DEFAULT_TAIL_WIDTH = linewidthint
+
+fontsize = size.small
+
+if labelsize == 'Small'
+    fontsize := size.small
+    fontsize
+
+if labelsize == 'Medium'
+    fontsize := size.normal
+    fontsize
+
+if labelsize == 'Large'
+    fontsize := size.large
+    fontsize
+
+linestyles = line.style_solid
+if linestyle == 'Dashed'
+    linestyles := line.style_dashed
+    linestyles
+
+if linestyle == 'Dotted'
+    linestyles := line.style_dotted
+    linestyles
+
+var DEFAULT_LABEL_SIZE = fontsize
+var DEFAULT_LABEL_STYLE = label.style_none
+var DEFAULT_EXTEND_RIGHT = distanceright
+
+//------------------------------ Plotting ------------------------------
+var pricearray = array.new_float(0)
+var labelarray = array.new_label(0)
+f_LevelMerge(pricearray, labelarray, currentprice, currentlabel, currentcolor) =>
+    if array.includes(pricearray, currentprice)
+        whichindex = array.indexof(pricearray, currentprice)
+        labelhold = array.get(labelarray, whichindex)
+        whichtext = label.get_text(labelhold)
+
+        label.set_text(labelhold, label.get_text(currentlabel) + ' / ' + whichtext)
+        label.set_text(currentlabel, '')
+        label.set_textcolor(labelhold, currentcolor)
+    else
+        array.push(pricearray, currentprice)
+        array.push(labelarray, currentlabel)
+
+var can_show_daily = is_daily_enabled and timeframe.isintraday
+var can_show_weekly = is_weekly_enabled and not timeframe.isweekly and not timeframe.ismonthly
+var can_show_monthly = is_monthly_enabled and not timeframe.ismonthly
+
+get_limit_right(bars) =>
+    timenow + (time - time[1]) * bars
+
+// the following code doesn't need to be processed on every candle
+if barstate.islast
+    is_weekly_open = dayofweek == dayofweek.monday
+    is_monthly_open = dayofmonth == 1
+    can_draw_daily = (is_weekly_enabled ? not is_weekly_open : true) and (is_monthly_enabled ? not is_monthly_open : true)
+    can_draw_weekly = is_monthly_enabled ? not(is_monthly_open and is_weekly_open) : true
+    can_draw_intra = is_intra_enabled
+    can_draw_intrah = is_intrarange_enabled
+    can_draw_intral = is_intrarange_enabled
+    can_draw_intram = is_intram_enabled
+    pricearray := array.new_float(0)
+    labelarray := array.new_label(0)
+
+//////////////////////////////////////////////////////////////////////////////////
+    if can_draw_intra
+        intra_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        if displayStyle == 'Right Anchored'
+            intra_time := get_limit_right(radistance)
+            intra_time
+
+        var intra_line = line.new(x1=intra_time, x2=intra_limit_right, y1=intra_open, y2=intra_open, color=IntraColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var intra_label = label.new(x=intra_limit_right, y=intra_open, text=iotext, style=DEFAULT_LABEL_STYLE, textcolor=IntraColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(intra_line, intra_time)
+        line.set_x2(intra_line, intra_limit_right)
+        line.set_y1(intra_line, intra_open)
+        line.set_y2(intra_line, intra_open)
+        label.set_x(intra_label, intra_limit_right)
+        label.set_y(intra_label, intra_open)
+        label.set_text(intra_label, iotext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, intra_open, intra_label, IntraColor)
+//////////////////////////////////////////////////////////////////////////////////
+//HIGH HIGH HIGH HIGH HIGH HIGH HIGH HIGH HIGH HIGH HIGH HIGH HIGH HIGH HIGH HIGH
+    if can_draw_intrah
+        intrah_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        if displayStyle == 'Right Anchored'
+            intrah_time := get_limit_right(radistance)
+            intrah_time
+
+        var intrah_line = line.new(x1=intrah_time, x2=intrah_limit_right, y1=intrah_open, y2=intrah_open, color=IntraColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var intrah_label = label.new(x=intrah_limit_right, y=intrah_open, text=pihtext, style=DEFAULT_LABEL_STYLE, textcolor=IntraColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(intrah_line, intrah_time)
+        line.set_x2(intrah_line, intrah_limit_right)
+        line.set_y1(intrah_line, intrah_open)
+        line.set_y2(intrah_line, intrah_open)
+        label.set_x(intrah_label, intrah_limit_right)
+        label.set_y(intrah_label, intrah_open)
+        label.set_text(intrah_label, pihtext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, intrah_open, intrah_label, IntraColor)
+//////////////////////////////////////////////////////////////////////////////////
+//LOW LOW LOW LOW LOW LOW LOW LOW LOW LOW LOW LOW LOW LOW LOW LOW
+    if can_draw_intral
+        intral_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        if displayStyle == 'Right Anchored'
+            intral_time := get_limit_right(radistance)
+            intral_time
+
+        var intral_line = line.new(x1=intral_time, x2=intral_limit_right, y1=intral_open, y2=intral_open, color=IntraColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var intral_label = label.new(x=intral_limit_right, y=intral_open, text=piltext, style=DEFAULT_LABEL_STYLE, textcolor=IntraColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(intral_line, intral_time)
+        line.set_x2(intral_line, intral_limit_right)
+        line.set_y1(intral_line, intral_open)
+        line.set_y2(intral_line, intral_open)
+        label.set_x(intral_label, intral_limit_right)
+        label.set_y(intral_label, intral_open)
+        label.set_text(intral_label, piltext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, intral_open, intral_label, IntraColor)
+///////////////////////////////////////////////////////////////////////////////   
+    if can_draw_intram
+        intram_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        intram_time = intrah_time
+        intram_open = (intral_open + intrah_open) / 2
+        if displayStyle == 'Right Anchored'
+            intram_time := get_limit_right(radistance)
+            intram_time
+
+        var intram_line = line.new(x1=intram_time, x2=intram_limit_right, y1=intram_open, y2=intram_open, color=IntraColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var intram_label = label.new(x=intram_limit_right, y=intram_open, text=pimtext, style=DEFAULT_LABEL_STYLE, textcolor=IntraColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+        line.set_x1(intram_line, intram_time)
+        line.set_x2(intram_line, intram_limit_right)
+        line.set_y1(intram_line, intram_open)
+        line.set_y2(intram_line, intram_open)
+        label.set_x(intram_label, intram_limit_right)
+        label.set_y(intram_label, intram_open)
+        label.set_text(intram_label, pimtext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, intram_open, intram_label, IntraColor)
+////////////////////////////////////////// MONDAY
+    if is_monday_enabled
+        monday_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        if displayStyle == 'Right Anchored'
+            monday_time := get_limit_right(radistance)
+            monday_time
+
+        var monday_line = line.new(x1=monday_time, x2=monday_limit_right, y1=monday_high, y2=monday_high, color=MondayColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var monday_label = label.new(x=monday_limit_right, y=monday_high, text=pmonhtext, style=DEFAULT_LABEL_STYLE, textcolor=MondayColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(monday_line, monday_time)
+        line.set_x2(monday_line, monday_limit_right)
+        line.set_y1(monday_line, monday_high)
+        line.set_y2(monday_line, monday_high)
+        label.set_x(monday_label, monday_limit_right)
+        label.set_y(monday_label, monday_high)
+        label.set_text(monday_label, pmonhtext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, monday_high, monday_label, MondayColor)
+
+    if is_monday_enabled
+        monday_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        if displayStyle == 'Right Anchored'
+            monday_time := get_limit_right(radistance)
+            monday_time
+
+        var monday_low_line = line.new(x1=monday_time, x2=monday_limit_right, y1=monday_low, y2=monday_low, color=MondayColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var monday_low_label = label.new(x=monday_limit_right, y=monday_low, text=pmonltext, style=DEFAULT_LABEL_STYLE, textcolor=MondayColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(monday_low_line, monday_time)
+        line.set_x2(monday_low_line, monday_limit_right)
+        line.set_y1(monday_low_line, monday_low)
+        line.set_y2(monday_low_line, monday_low)
+        label.set_x(monday_low_label, monday_limit_right)
+        label.set_y(monday_low_label, monday_low)
+        label.set_text(monday_low_label, pmonltext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, monday_low, monday_low_label, MondayColor)
+
+    if is_monday_mid
+        mondaym_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+
+        mondaym_open = (monday_high + monday_low) / 2
+        if displayStyle == 'Right Anchored'
+            monday_time := get_limit_right(radistance)
+            monday_time
+
+        var mondaym_line = line.new(x1=monday_time, x2=mondaym_limit_right, y1=mondaym_open, y2=mondaym_open, color=MondayColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var mondaym_label = label.new(x=mondaym_limit_right, y=mondaym_open, text=pmonmtext, style=DEFAULT_LABEL_STYLE, textcolor=MondayColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+        line.set_x1(mondaym_line, monday_time)
+        line.set_x2(mondaym_line, mondaym_limit_right)
+        line.set_y1(mondaym_line, mondaym_open)
+        line.set_y2(mondaym_line, mondaym_open)
+        label.set_x(mondaym_label, mondaym_limit_right)
+        label.set_y(mondaym_label, mondaym_open)
+        label.set_text(mondaym_label, pmonmtext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, mondaym_open, mondaym_label, MondayColor)
+//////////////////////////////////////////////////////////////////////////////////
+////////////////////////DAILY OPEN DAILY OPEN DAILY OPEN DAILY OPEN DAILY OPEN DAILY OPEN DAILY OPEN
+    if is_daily_enabled
+        daily_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        if displayStyle == 'Right Anchored'
+            daily_time := get_limit_right(radistance)
+            daily_time
+
+        var daily_line = line.new(x1=daily_time, x2=daily_limit_right, y1=daily_open, y2=daily_open, color=DailyColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var daily_label = label.new(x=daily_limit_right, y=daily_open, text=dotext, style=DEFAULT_LABEL_STYLE, textcolor=DailyColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(daily_line, daily_time)
+        line.set_x2(daily_line, daily_limit_right)
+        line.set_y1(daily_line, daily_open)
+        line.set_y2(daily_line, daily_open)
+        label.set_x(daily_label, daily_limit_right)
+        label.set_y(daily_label, daily_open)
+        label.set_text(daily_label, dotext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, daily_open, daily_label, DailyColor)
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////DAILY HIGH DAILY HIGH DAILY HIGH DAILY HIGH DAILY HIGH DAILY HIGH DAILY HIGH 
+    if is_dailyrange_enabled
+        dailyh_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        if displayStyle == 'Right Anchored'
+            dailyh_time := get_limit_right(radistance)
+            dailyh_time
+        // draw tails before lines for better visual
+
+        var dailyh_line = line.new(x1=dailyh_time, x2=dailyh_limit_right, y1=dailyh_open, y2=dailyh_open, color=DailyColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var dailyh_label = label.new(x=dailyh_limit_right, y=dailyh_open, text=pdhtext, style=DEFAULT_LABEL_STYLE, textcolor=DailyColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(dailyh_line, dailyh_time)
+        line.set_x2(dailyh_line, dailyh_limit_right)
+        line.set_y1(dailyh_line, dailyh_open)
+        line.set_y2(dailyh_line, dailyh_open)
+        label.set_x(dailyh_label, dailyh_limit_right)
+        label.set_y(dailyh_label, dailyh_open)
+        label.set_text(dailyh_label, pdhtext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, dailyh_open, dailyh_label, DailyColor)
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////DAILY LOW DAILY LOW DAILY LOW DAILY LOW DAILY LOW DAILY LOW DAILY LOW DAILY LOW 
+    if is_dailyrange_enabled
+        dailyl_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        if displayStyle == 'Right Anchored'
+            dailyl_time := get_limit_right(radistance)
+            dailyl_time
+
+        var dailyl_line = line.new(x1=dailyl_time, x2=dailyl_limit_right, y1=dailyl_open, y2=dailyl_open, color=DailyColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var dailyl_label = label.new(x=dailyl_limit_right, y=dailyl_open, text=pdltext, style=DEFAULT_LABEL_STYLE, textcolor=DailyColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(dailyl_line, dailyl_time)
+        line.set_x2(dailyl_line, dailyl_limit_right)
+        line.set_y1(dailyl_line, dailyl_open)
+        line.set_y2(dailyl_line, dailyl_open)
+        label.set_x(dailyl_label, dailyl_limit_right)
+        label.set_y(dailyl_label, dailyl_open)
+        label.set_text(dailyl_label, pdltext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, dailyl_open, dailyl_label, DailyColor)
+//////////////////////////////////////////////////////////////////////////////// Daily MID
+    if is_dailym_enabled
+        dailym_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        dailym_time = dailyh_time
+        dailym_open = (dailyl_open + dailyh_open) / 2
+        if displayStyle == 'Right Anchored'
+            dailym_time := get_limit_right(radistance)
+            dailym_time
+        var dailym_line = line.new(x1=dailym_time, x2=dailym_limit_right, y1=dailym_open, y2=dailym_open, color=DailyColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var dailym_label = label.new(x=dailym_limit_right, y=dailym_open, text=pdmtext, style=DEFAULT_LABEL_STYLE, textcolor=DailyColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+        line.set_x1(dailym_line, dailym_time)
+        line.set_x2(dailym_line, dailym_limit_right)
+        line.set_y1(dailym_line, dailym_open)
+        line.set_y2(dailym_line, dailym_open)
+        label.set_x(dailym_label, dailym_limit_right)
+        label.set_y(dailym_label, dailym_open)
+        label.set_text(dailym_label, pdmtext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, dailym_open, dailym_label, DailyColor)
+
+//////////////////////////////////////////////////////////////////////////////////
+    if is_weekly_enabled
+        weekly_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        cweekly_time = weekly_time
+        if displayStyle == 'Right Anchored'
+            cweekly_time := get_limit_right(radistance)
+            cweekly_time
+
+        var weekly_line = line.new(x1=cweekly_time, x2=weekly_limit_right, y1=weekly_open, y2=weekly_open, color=WeeklyColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var weekly_label = label.new(x=weekly_limit_right, y=weekly_open, text=wotext, style=DEFAULT_LABEL_STYLE, textcolor=WeeklyColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(weekly_line, cweekly_time)
+        line.set_x2(weekly_line, weekly_limit_right)
+        line.set_y1(weekly_line, weekly_open)
+        line.set_y2(weekly_line, weekly_open)
+        label.set_x(weekly_label, weekly_limit_right)
+        label.set_y(weekly_label, weekly_open)
+        label.set_text(weekly_label, wotext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, weekly_open, weekly_label, WeeklyColor)
+        // the weekly open can be the daily open too (monday)
+        // only the weekly will be draw, in these case we update its label
+    // if is_weekly_open and can_show_daily
+            // label.set_text(weekly_label, "DO / WO            ")
+//////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////// WEEKLY HIGH WEEKLY HIGH WEEKLY HIGH
+    if is_weeklyrange_enabled
+        weeklyh_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        if displayStyle == 'Right Anchored'
+            weeklyh_time := get_limit_right(radistance)
+            weeklyh_time
+
+        var weeklyh_line = line.new(x1=weeklyh_time, x2=weeklyh_limit_right, y1=weeklyh_open, y2=weeklyh_open, color=WeeklyColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var weeklyh_label = label.new(x=weeklyh_limit_right, y=weeklyh_open, text=pwhtext, style=DEFAULT_LABEL_STYLE, textcolor=WeeklyColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(weeklyh_line, weeklyh_time)
+        line.set_x2(weeklyh_line, weeklyh_limit_right)
+        line.set_y1(weeklyh_line, weeklyh_open)
+        line.set_y2(weeklyh_line, weeklyh_open)
+        label.set_x(weeklyh_label, weeklyh_limit_right)
+        label.set_y(weeklyh_label, weeklyh_open)
+        label.set_text(weeklyh_label, pwhtext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, weeklyh_open, weeklyh_label, WeeklyColor)
+//////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////// WEEKLY LOW WEEKLY LOW WEEKLY LOW
+    if is_weeklyrange_enabled
+        weeklyl_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        if displayStyle == 'Right Anchored'
+            weeklyl_time := get_limit_right(radistance)
+            weeklyl_time
+
+        var weeklyl_line = line.new(x1=weeklyl_time, x2=weeklyl_limit_right, y1=weekly_open, y2=weekly_open, color=WeeklyColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var weeklyl_label = label.new(x=weeklyl_limit_right, y=weeklyl_open, text=pwltext, style=DEFAULT_LABEL_STYLE, textcolor=WeeklyColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(weeklyl_line, weeklyl_time)
+        line.set_x2(weeklyl_line, weeklyl_limit_right)
+        line.set_y1(weeklyl_line, weeklyl_open)
+        line.set_y2(weeklyl_line, weeklyl_open)
+        label.set_x(weeklyl_label, weeklyl_limit_right)
+        label.set_y(weeklyl_label, weeklyl_open)
+        label.set_text(weeklyl_label, pwltext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, weeklyl_open, weeklyl_label, WeeklyColor)
+
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////// Weekly MID
+    if is_weekly_mid
+        weeklym_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        weeklym_time = weeklyh_time
+        weeklym_open = (weeklyl_open + weeklyh_open) / 2
+        if displayStyle == 'Right Anchored'
+            weeklym_time := get_limit_right(radistance)
+            weeklym_time
+
+        var weeklym_line = line.new(x1=weeklym_time, x2=weeklym_limit_right, y1=weeklym_open, y2=weeklym_open, color=WeeklyColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var weeklym_label = label.new(x=weeklym_limit_right, y=weeklym_open, text=pwmtext, style=DEFAULT_LABEL_STYLE, textcolor=WeeklyColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+        line.set_x1(weeklym_line, weeklym_time)
+        line.set_x2(weeklym_line, weeklym_limit_right)
+        line.set_y1(weeklym_line, weeklym_open)
+        line.set_y2(weeklym_line, weeklym_open)
+        label.set_x(weeklym_label, weeklym_limit_right)
+        label.set_y(weeklym_label, weeklym_open)
+        label.set_text(weeklym_label, pwmtext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, weeklym_open, weeklym_label, WeeklyColor)
+////////////////////////////////////////////////////////////////////////////////// Monthly LOW LOW LOW
+    if is_monthlyrange_enabled
+        monthlyl_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        if displayStyle == 'Right Anchored'
+            monthlyl_time := get_limit_right(radistance)
+            monthlyl_time
+
+        var monthlyl_line = line.new(x1=monthlyl_time, x2=monthlyl_limit_right, y1=monthlyl_open, y2=monthlyl_open, color=MonthlyColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var monthlyl_label = label.new(x=monthlyl_limit_right, y=monthlyl_open, text=pmltext, style=DEFAULT_LABEL_STYLE, textcolor=MonthlyColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(monthlyl_line, monthlyl_time)
+        line.set_x2(monthlyl_line, monthlyl_limit_right)
+        line.set_y1(monthlyl_line, monthlyl_open)
+        line.set_y2(monthlyl_line, monthlyl_open)
+        label.set_x(monthlyl_label, monthlyl_limit_right)
+        label.set_y(monthlyl_label, monthlyl_open)
+        label.set_text(monthlyl_label, pmltext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, monthlyl_open, monthlyl_label, MonthlyColor)
+        // the weekly open can be the daily open too (monday)
+        // only the weekly will be draw, in these case we update its label
+//////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////// MONTHLY HIGH HIGH HIGH
+    if is_monthlyrange_enabled
+        monthlyh_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        if displayStyle == 'Right Anchored'
+            monthlyh_time := get_limit_right(radistance)
+            monthlyh_time
+
+        var monthlyh_line = line.new(x1=monthlyh_time, x2=monthlyh_limit_right, y1=monthlyh_open, y2=monthlyh_open, color=MonthlyColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var monthlyh_label = label.new(x=monthlyh_limit_right, y=monthlyh_open, text=pmhtext, style=DEFAULT_LABEL_STYLE, textcolor=MonthlyColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(monthlyh_line, monthlyl_time)
+        line.set_x2(monthlyh_line, monthlyh_limit_right)
+        line.set_y1(monthlyh_line, monthlyh_open)
+        line.set_y2(monthlyh_line, monthlyh_open)
+        label.set_x(monthlyh_label, monthlyh_limit_right)
+        label.set_y(monthlyh_label, monthlyh_open)
+        label.set_text(monthlyh_label, pmhtext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, monthlyh_open, monthlyh_label, MonthlyColor)
+        // the weekly open can be the daily open too (monday)
+        // only the weekly will be draw, in these case we update its label
+//////////////////////////////////////////////////////////////////////////////// MONTHLY MID
+    if is_monthly_mid
+        monthlym_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        monthlym_time = monthlyh_time
+        monthlym_open = (monthlyl_open + monthlyh_open) / 2
+        if displayStyle == 'Right Anchored'
+            monthlym_time := get_limit_right(radistance)
+            monthlym_time
+        var monthlym_line = line.new(x1=monthlym_time, x2=monthlym_limit_right, y1=monthlym_open, y2=monthlym_open, color=MonthlyColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var monthlym_label = label.new(x=monthlym_limit_right, y=monthlym_open, text=pmmtext, style=DEFAULT_LABEL_STYLE, textcolor=MonthlyColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+        line.set_x1(monthlym_line, monthlym_time)
+        line.set_x2(monthlym_line, monthlym_limit_right)
+        line.set_y1(monthlym_line, monthlym_open)
+        line.set_y2(monthlym_line, monthlym_open)
+        label.set_x(monthlym_label, monthlym_limit_right)
+        label.set_y(monthlym_label, monthlym_open)
+        label.set_text(monthlym_label, pmmtext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, monthlym_open, monthlym_label, MonthlyColor)
+//////////////////////////////////////////////////////////////////////////////////
+    if is_monthly_enabled
+        monthly_limit_right = get_limit_right(DEFAULT_EXTEND_RIGHT)
+        if displayStyle == 'Right Anchored'
+            monthly_time := get_limit_right(radistance)
+            monthly_time
+
+        var monthlyLine = line.new(x1=monthly_time, x2=monthly_limit_right, y1=monthly_open, y2=monthly_open, color=MonthlyColor, width=DEFAULT_LINE_WIDTH, xloc=xloc.bar_time, style=linestyles)
+        var monthlyLabel = label.new(x=monthly_limit_right, y=monthly_open, text=motext, style=DEFAULT_LABEL_STYLE, textcolor=MonthlyColor, size=DEFAULT_LABEL_SIZE, xloc=xloc.bar_time)
+
+        line.set_x1(monthlyLine, monthly_time)
+        line.set_x2(monthlyLine, monthly_limit_right)
+        line.set_y1(monthlyLine, monthly_open)
+        line.set_y2(monthlyLine, monthly_open)
+        label.set_x(monthlyLabel, monthly_limit_right)
+        label.set_y(monthlyLabel, monthly_open)
+        label.set_text(monthlyLabel, motext)
+        if mergebool
+            f_LevelMerge(pricearray, labelarray, monthly_open, monthlyLabel, MonthlyColor)
+/////////////////////////////////////////////////////////////////////////////
+        // the monthly open can be the weekly open (monday 1st) and/or daily open too
+        // only the monthly will be draw, in these case we update its label
+        // if is_monthly_open
+        //     if can_show_daily
+        //         label.set_text(monthlyLabel, "DO / MO            ")
+        //     if is_weekly_open
+        //         if can_show_weekly
+        //             label.set_text(monthlyLabel, "WO / MO            ")
+        //         if can_show_daily and can_show_weekly
+        //             label.set_text(monthlyLabel, "DO / WO / MO                ")
+
+        // the start of the line is drew from the first week of the month
+        // if the first day of the weekly candle (monday) is the 2nd of the month
+        // we fix the start of the line position on the Prev weekly candle
+        if timeframe.isweekly and dayofweek(monthly_time) != dayofweek.monday
+            line.set_x1(monthlyLine, monthly_time - (weekly_time - weekly_time[1]))
