@@ -1,0 +1,32 @@
+study(shorttitle="BBx3", title="Triple Bollinger Bands", overlay=true)
+length = input(20, minval=1)
+src = input(close, title="Source")
+mult = input(1.0, minval=0.001, maxval=10, step=0.2)
+basis = sma(src, length)
+dev = mult * stdev(src, length)
+upper = basis + dev
+lower = basis - dev
+
+mult2 = input(2.0, minval=0.001, maxval=10, step=0.2)
+dev2 = mult2 * stdev(src, length)
+upper2 = basis + dev2
+lower2 = basis - dev2
+
+mult3 = input(3.0, minval=0.001, maxval=10, step=0.2)
+dev3 = mult3 * stdev(src, length)
+upper3 = basis + dev3
+lower3 = basis - dev3
+
+plot(basis, color=red) //sma
+p1a = plot(upper, color=orange)
+p1b = plot(lower, color=orange)
+
+p2a = plot(upper2, color=yellow)
+p2b = plot(lower2, color=yellow)
+
+p3a = plot(upper3, color=red)
+p3b = plot(lower3, color=green)
+
+fill(p3a, p3b, color=white)  
+//there are many ways to shade this, including alternating colors 
+//or have the more extreme deviations a special color by filling in between 3a and 2a then 3b and 2b, very similar to the rsi buy and sell colors
