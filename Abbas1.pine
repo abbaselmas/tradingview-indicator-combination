@@ -8,9 +8,9 @@ basis = 	ta.sma(src, length)
 dev = mult * ta.stdev(src, length)
 upper = basis + dev
 lower = basis - dev
-plot		(basis, color=color.orange)
-p1a = plot	(upper, color=color.green)
-p1b = plot	(lower, color=color.red)
+plot		(basis, color=color.new(#ff9800, 80))
+p1a = plot	(upper, color=color.new(#089981, 80))
+p1b = plot	(lower, color=color.new(#f23645, 80))
 
 //weekendicator
 multiplier = input.float(3, minval=0, maxval=10, step=0.1, group = "Weekend")
