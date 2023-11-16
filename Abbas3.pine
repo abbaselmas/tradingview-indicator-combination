@@ -1,6 +1,7 @@
 //@version=5
 indicator(title='PVP | nPOCs | Key Levels', shorttitle='Abbas3', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
 
+//Periodic Volume Profile
 var bool is_first_candle= true
 var diff = 0.0
 float maxV = 0.0
@@ -11,21 +12,21 @@ ys=0.0
 int bar_offset=0
 var is_first_inRange=false
 
-period_time   		= input.int(15, "Number of days (Min: 3, Max: 500)", minval = 3, maxval = 500)
-resolution   		= input.int(500, "calculation resolution (Min: 400, Max: 700)", minval  = 400, maxval  = 700)
-show_from   		= input.int(3, "show support/resistance since (Min: 2, Max: 45)", minval  = 2, maxval  = 45)
-show_volume_bars  	= input.bool(false, "Show volume bars (If selected, maximum days are 17)")
-show_vpoc_line   	= input.bool(true, "Show VPOC line")
-show_support_line   = input.bool(false, "Show support line")
-show_res_line   	= input.bool(false, "Show resistance line")
-show_H_line   		= input.bool(false, "Show high line")
-show_L_line  		= input.bool(false, "Show low line")
-show_labels   		= input.bool(false, "Show from days label")
-vpoc_color   		= input.color(color.new(#FF0015, 10), "VPOC color")
-high_low_color 		= input.color(color.new(color.blue, 50), "High-low lines color")
-volume_bars_color   = input.color(color.new(color.green, 70), "Volume bars color")
-sup_color 			= input.color(color.new(color.red, 10), "Support line color")
-res_color 			= input.color(color.new(color.green, 10),"Resistance line color")
+period_time   		= input.int(15, "Number of days (Min: 3, Max: 500)", minval = 3, maxval = 500, group = "Periodic Volume Profile")
+resolution   		  = input.int(500, "calculation resolution (Min: 400, Max: 700)", minval  = 400, maxval  = 700, group = "Periodic Volume Profile")
+show_from   		  = input.int(3, "show support/resistance since (Min: 2, Max: 45)", minval  = 2, maxval  = 45, group = "Periodic Volume Profile")
+show_volume_bars  = input.bool(false, "Show volume bars (If selected, maximum days are 17)", group = "Periodic Volume Profile")
+show_vpoc_line   	= input.bool(true, "Show VPOC line", group = "Periodic Volume Profile")
+show_support_line = input.bool(false, "Show support line", group = "Periodic Volume Profile")
+show_res_line   	= input.bool(false, "Show resistance line", group = "Periodic Volume Profile")
+show_H_line   		= input.bool(false, "Show high line", group = "Periodic Volume Profile")
+show_L_line  		  = input.bool(false, "Show low line", group = "Periodic Volume Profile")
+show_labels   		= input.bool(false, "Show from days label", group = "Periodic Volume Profile")
+vpoc_color   		  = input.color(color.new(#FF0015, 10), "VPOC color", group = "Periodic Volume Profile")
+high_low_color 		= input.color(color.new(color.blue, 50), "High-low lines color", group = "Periodic Volume Profile")
+volume_bars_color = input.color(color.new(color.green, 70), "Volume bars color", group = "Periodic Volume Profile")
+sup_color 			  = input.color(color.new(color.red, 10), "Support line color", group = "Periodic Volume Profile")
+res_color 			  = input.color(color.new(color.green, 10),"Resistance line color", group = "Periodic Volume Profile")
 
 range_prices = array.new_float((resolution + 1), 0.0)
 partial_vol = array.new_float(resolution, 0.0)

@@ -1,18 +1,37 @@
 //@version=5
 indicator(title='Range | Blocks | NYOpens | Weekendicator | CME | BPR', shorttitle="Abbas1", overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
+//Bollinger Bands
+length = 	input.int(21, minval=1, group="BB")
+src = 		input(close, title="Source", group="BB")
+mult = 		input.float(2.8, minval=0.5, maxval=3, step=0.01, group="BB")
+basis = 	ta.sma(src, length)
+dev = mult * ta.stdev(src, length)
+upper = basis + dev
+lower = basis - dev
+plot		(basis, color=color.orange)
+p1a = plot	(upper, color=color.green)
+p1b = plot	(lower, color=color.red)
 
-bool        msb_sv          = input.bool        (true,                           title='Plot MSB lines')
-bool        box_sv          = input.bool        (true,                           title='Plot Orderblocks')
-bool        m_sv            = input.bool        (true,                          title='Plot Breakerblocks')
-bool        range_sv        = input.bool        (true,                           title='Plot Range')
-bool        range_eq_sv     = input.bool        (true,                           title='Plot Range 0.5 Line')
-bool        range_q_sv      = input.bool        (true,                           title='Plot Range 0.25 and 0.75 Lines')
-color       u_s             = input.color       (color.new(#089981, 80),         title='Untested Supply Color')
-color       t_s             = input.color       (color.new(#b2b5be, 80),         title='Tested Supply Color')
-color       u_d             = input.color       (color.new(#f23645, 80),         title='Untested Demand Color')
-color       t_d             = input.color       (color.new(#b2b5be, 80),         title='Tested Demand Color')
-color       u_b             = input.color       (color.new(#ff9800, 80),         title='Untested Breaker Color')
-color       t_b             = input.color       (color.new(#b2b5be, 80),         title='Tested Breaker Color')
+//weekendicator
+multiplier = input.float(3, minval=0, maxval=10, step=0.1, group = "Weekend")
+
+day_clr = dayofweek < 2 or dayofweek > 6 ? color.new(#9598a1, 80) : color.new(#9598a1, 100)
+plot(((high / low) * ohlc4) * (1 + multiplier / 100), style=plot.style_line, color=day_clr)
+plot(((low / high) * ohlc4) * (1 - multiplier / 100), style=plot.style_area, color=day_clr)
+
+//range blocks
+bool        msb_sv          = input.bool        (true,                             title='Plot MSB lines', group="Range Blocks")
+bool        box_sv          = input.bool        (true,                             title='Plot Orderblocks', group="Range Blocks")
+bool        m_sv            = input.bool        (true,                             title='Plot Breakerblocks', group="Range Blocks")
+bool        range_sv        = input.bool        (true,                             title='Plot Range', group="Range Blocks")
+bool        range_eq_sv     = input.bool        (true,                             title='Plot Range 0.5 Line', group="Range Blocks")
+bool        range_q_sv      = input.bool        (true,                             title='Plot Range 0.25 and 0.75 Lines', group="Range Blocks")
+color       u_s             = input.color       (color.new(#089981, 80),         title='Untested Supply Color', group="Range Blocks")
+color       t_s             = input.color       (color.new(#b2b5be, 80),         title='Tested Supply Color', group="Range Blocks")
+color       u_d             = input.color       (color.new(#f23645, 80),         title='Untested Demand Color', group="Range Blocks")
+color       t_d             = input.color       (color.new(#b2b5be, 80),         title='Tested Demand Color', group="Range Blocks")
+color       u_b             = input.color       (color.new(#ff9800, 80),         title='Untested Breaker Color', group="Range Blocks")
+color       t_b             = input.color       (color.new(#b2b5be, 80),         title='Tested Breaker Color', group="Range Blocks")
 
 var float[] pvh1_price      = array.new_float   (30, na)            // high
 var int[]   pvh1_time       = array.new_int     (30, na)
@@ -59,14 +78,6 @@ bool        new_ph_2nd      = false
 bool        new_pl_2nd      = false
 string      alert           = na
 
-//weekendicator
-multiplier = input.float(3, minval=0, maxval=10, step=0.1, group = "Weekend")
-
-day_clr = dayofweek < 2 or dayofweek > 6 ? color.new(#9598a1, 80) : color.new(#9598a1, 100)
-plot(((high / low) * ohlc4) * (1 + multiplier / 100), style=plot.style_line, color=day_clr)
-plot(((low / high) * ohlc4) * (1 - multiplier / 100), style=plot.style_area, color=day_clr)
-
-// range blocks etc
 if barstate.isconfirmed
 	if pvh
 		array.pop(pvh1_price)
@@ -298,12 +309,12 @@ if i8Display
 //===========================
 
 // Balanced Price Range
-bpr_threshold = input.float(0, step = 0.25, title = "BPR Threshold", tooltip = "Valid BPR's must have a range greater than this number")
-bars_since = input(15, "Bars to Look Back for BPR", tooltip = "Only look for BPR's when a sequence of bearish and bullish FVG's are within this many bars of each other")
-only_clean_bpr = input(false, "Only Clean BPR", tooltip = "Only show BPR's when price does not interfere with the range prior to its completion")
-delete_old_bpr = input(true, "Delete Old BPR", tooltip = "Delete all BPR's that have been invalidated or overwritten. Only show current/active BPR's")
-bearish_bpr_color = input.color(color.new(color.green, 70))
-bullish_bpr_color = input.color(color.new(color.green, 70))
+bpr_threshold = 	input.float(0, step = 0.25, title = "BPR Threshold", tooltip = "Valid BPR's must have a range greater than this number", group = "Balanced Price Range")
+bars_since = 		input(15, "Bars to Look Back for BPR", tooltip = "Only look for BPR's when a sequence of bearish and bullish FVG's are within this many bars of each other", group = "Balanced Price Range")
+only_clean_bpr =	input(false, "Only Clean BPR", tooltip = "Only show BPR's when price does not interfere with the range prior to its completion", group = "Balanced Price Range")
+delete_old_bpr = 	input(true, "Delete Old BPR", tooltip = "Delete all BPR's that have been invalidated or overwritten. Only show current/active BPR's", group = "Balanced Price Range")
+bearish_bpr_color = input.color(color.new(color.green, 70), group = "Balanced Price Range")
+bullish_bpr_color = input.color(color.new(color.green, 70), group = "Balanced Price Range")
 
 float box_high = na
 float box_low = na
@@ -390,7 +401,8 @@ mode = input.string(
      defval="1 - Close from current symbol",
      title="Mode",
      options=["1 - Close from current symbol", "2 - CME original close crice", "3 - CME settlement price"],
-     tooltip="In Mode 1 the closing price is determined in the current symbol but with the tradinghours from the CME futures contract. Mode 2 and 3 obtain the price directly from the CME futures contract and paint it in the chart of the current symbol. But note, that modes 2 and 3  may not give you the expected result, due to price differences in futures and spot prices.")
+     tooltip="In Mode 1 the closing price is determined in the current symbol but with the tradinghours from the CME futures contract. Mode 2 and 3 obtain the price directly from the CME futures contract and paint it in the chart of the current symbol. But note, that modes 2 and 3  may not give you the expected result, due to price differences in futures and spot prices.",
+	 group="CME gap")
 
 cme = request.security("CME:BTC1!", "60", close)
 cmeSettlement = request.security("CME:BTC1!", "D", close, lookahead=barmerge.lookahead_on)
