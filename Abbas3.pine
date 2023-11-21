@@ -315,8 +315,8 @@ var is_intram_enabled = input.bool(defval=false, title='Prev Mid', group='4H', i
 IntraTextType = input.bool(defval=false, title='ShortHand', group='4H', inline='4Hsh')
 
 var is_daily_enabled = input.bool(defval=true, title='Open', group='Daily', inline='Daily')
-var is_dailyrange_enabled = input.bool(defval=false, title='Prev H/L', group='Daily', inline='Daily')
-var is_dailym_enabled = input.bool(defval=false, title='Prev Mid', group='Daily', inline='Daily')
+var is_dailyrange_enabled = input.bool(defval=true, title='Prev H/L', group='Daily', inline='Daily')
+var is_dailym_enabled = input.bool(defval=true, title='Prev Mid', group='Daily', inline='Daily')
 DailyTextType = input.bool(defval=false, title='ShortHand', group='Daily', inline='Dailysh')
 
 var is_monday_enabled = input.bool(defval=true, title='Range', group='Monday Range', inline='Monday')
@@ -329,7 +329,7 @@ var is_weeklyrange_enabled = input.bool(defval=true, title='Prev H/L', group='We
 var is_weekly_mid = input.bool(defval=true, title='Prev Mid', group='Weekly', inline='Weekly')
 WeeklyTextType = input.bool(defval=false, title='ShortHand', group='Weekly', inline='Weeklysh')
 
-var is_monthly_enabled = input.bool(defval=false, title='Open', group='Monthly', inline='Monthly')
+var is_monthly_enabled = input.bool(defval=true, title='Open', group='Monthly', inline='Monthly')
 var is_monthlyrange_enabled = input.bool(defval=false, title='Prev H/L', group='Monthly', inline='Monthly')
 var is_monthly_mid = input.bool(defval=false, title='Prev Mid', group='Monthly', inline='Monthly')
 MonthlyTextType = input.bool(defval=false, title='ShortHand', group='Monthly', inline='Monthlysh')
@@ -1011,10 +1011,10 @@ eq_len = input.int(3, 'Bars Confirmation'
   , group = 'EQH/EQL'
   , tooltip = EQHL_BARS)
 
-eq_threshold = input.float(0.1, 'Threshold'
+eq_threshold = input.float(0.05, 'Threshold'
   , minval = 0
   , maxval = 0.5
-  , step = 0.1
+  , step = 0.01
   , group = 'EQH/EQL'
   , tooltip = EQHL_THRESHOLD)
 

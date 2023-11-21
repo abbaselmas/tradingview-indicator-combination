@@ -8,16 +8,16 @@ basis = 	ta.sma(src, length)
 dev = mult * ta.stdev(src, length)
 upper = basis + dev
 lower = basis - dev
-plot		(basis, color=color.new(#ff9800, 80))
-p1a = plot	(upper, color=color.new(#089981, 80))
-p1b = plot	(lower, color=color.new(#f23645, 80))
+plot		(basis, "BB Basis", color=color.new(#ff9800, 60))
+p1a = plot	(upper, "BB Upper", color=color.new(#089981, 60))
+p1b = plot	(lower, "BB Lower", color=color.new(#f23645, 60))
 
 //weekendicator
 multiplier = input.float(3, minval=0, maxval=10, step=0.1, group = "Weekend")
 
 day_clr = dayofweek < 2 or dayofweek > 6 ? color.new(#9598a1, 80) : color.new(#9598a1, 100)
-plot(((high / low) * ohlc4) * (1 + multiplier / 100), style=plot.style_line, color=day_clr)
-plot(((low / high) * ohlc4) * (1 - multiplier / 100), style=plot.style_area, color=day_clr)
+plot(((high / low) * ohlc4) * (1 + multiplier / 100), "Weekendicator Above", style=plot.style_line, color=day_clr)
+plot(((low / high) * ohlc4) * (1 - multiplier / 100), "Weekendicator Below", style=plot.style_area, color=day_clr)
 
 //range blocks
 bool        msb_sv          = input.bool        (true,                             title='Plot MSB lines', group="Range Blocks")
@@ -76,7 +76,6 @@ float       pv1_high        = high[1]
 float       pv1_low         = low[1]
 bool        new_ph_2nd      = false
 bool        new_pl_2nd      = false
-string      alert           = na
 
 if barstate.isconfirmed
 	if pvh
@@ -310,7 +309,7 @@ if i8Display
 
 // Balanced Price Range
 bpr_threshold = 	input.float(0, step = 0.25, title = "BPR Threshold", tooltip = "Valid BPR's must have a range greater than this number", group = "Balanced Price Range")
-bars_since = 		input(15, "Bars to Look Back for BPR", tooltip = "Only look for BPR's when a sequence of bearish and bullish FVG's are within this many bars of each other", group = "Balanced Price Range")
+bars_since = 		input(50, "Bars to Look Back for BPR", tooltip = "Only look for BPR's when a sequence of bearish and bullish FVG's are within this many bars of each other", group = "Balanced Price Range")
 only_clean_bpr =	input(false, "Only Clean BPR", tooltip = "Only show BPR's when price does not interfere with the range prior to its completion", group = "Balanced Price Range")
 delete_old_bpr = 	input(true, "Delete Old BPR", tooltip = "Delete all BPR's that have been invalidated or overwritten. Only show current/active BPR's", group = "Balanced Price Range")
 bearish_bpr_color = input.color(color.new(color.green, 70), group = "Balanced Price Range")
@@ -354,7 +353,6 @@ if bull_result[1]
     if delete_old_bpr and not na(box_bullish)
         box.delete(box_bullish)
     box_bullish := box.new(bar_index - bull_num_since - 1, bull_combined_high[1], bar_index + 1, bull_combined_low[1], border_color = bullish_bpr_color, border_width = 1, bgcolor = bullish_bpr_color)
-alertcondition(bull_result[1], "Bullish Alert", "New Bullish BPR")
 
 if not na(box_bullish) and low > box.get_bottom(box_bullish)
     box.set_right(box_bullish, bar_index + 1)
@@ -385,7 +383,6 @@ if bear_result[1]
     if delete_old_bpr and not na(box_bearish)
         box.delete(box_bearish)
     box_bearish := box.new(bar_index - bear_num_since - 1, bear_combined_high[1], bar_index + 1, bear_combined_low[1], border_color = bearish_bpr_color, border_width = 1, bgcolor = bearish_bpr_color)
-alertcondition(bear_result[1], "Bearish Alert", "New Bearish BPR")
 
 if not na(box_bearish) and high < box.get_top(box_bearish)
     box.set_right(box_bearish, bar_index + 1)
@@ -429,4 +426,4 @@ getCloseCME() =>
 //Plotting
 plot1 = plot(showLine == 1 ? cmeClose : na, 'CME Friday Close', style=plot.style_linebr, linewidth=2, color=color.new(color.blue, 0))
 plot2 = plot(close, 'Dummy plot for background', color=na)
-fill(plot1, plot2, title='Background', color=close > cmeClose ? color.new(color.green, 80) : close < cmeClose ? color.new(color.red, 80) : na)
+fill(plot1, plot2, title='CME Background', color=close > cmeClose ? color.new(color.green, 80) : close < cmeClose ? color.new(color.red, 80) : na)
