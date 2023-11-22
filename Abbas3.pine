@@ -12,8 +12,8 @@ ys=0.0
 int bar_offset=0
 var is_first_inRange=false
 
-period_time   		= input.int(15, "Number of days (Min: 3, Max: 500)", minval = 3, maxval = 500, group = "Periodic Volume Profile")
-resolution   		  = input.int(500, "calculation resolution (Min: 400, Max: 700)", minval  = 400, maxval  = 700, group = "Periodic Volume Profile")
+period_time   		= input.int(8, "Number of days (Min: 3, Max: 500)", minval = 3, maxval = 500, group = "Periodic Volume Profile")
+resolution   		  = input.int(700, "calculation resolution (Min: 400, Max: 700)", minval  = 400, maxval  = 700, group = "Periodic Volume Profile")
 show_from   		  = input.int(3, "show support/resistance since (Min: 2, Max: 45)", minval  = 2, maxval  = 45, group = "Periodic Volume Profile")
 show_volume_bars  = input.bool(false, "Show volume bars (If selected, maximum days are 17)", group = "Periodic Volume Profile")
 show_vpoc_line   	= input.bool(true, "Show VPOC line", group = "Periodic Volume Profile")
@@ -161,7 +161,7 @@ if is_first_inRange or barstate.islast
 //npoc chart champs
 show_nPOCs = input.bool(true, title='Show Naked POCs', group='Naked Point of Control Settings')
 dtf = input.timeframe('D', title='nPOC - Time Frame', group='Naked Point of Control Settings')
-symbol_resolution = input.float(1, title='Resolution (Change resolution to Symbol decimal)', group='Symbol Settings', tooltip='E.g. BTC = 1, APE = 0.01, OPTUSD = 0.0001')
+symbol_resolution = input.float(0.0000001, title='Resolution (Change resolution to Symbol decimal)', group='Symbol Settings', tooltip='E.g. BTC = 1, APE = 0.01, OPTUSD = 0.0001')
 
 show_nPOCs_color = input.color(color.new(#F236BA, 10), title='nPOC - Color', group='Naked Point of Control Settings')
 
