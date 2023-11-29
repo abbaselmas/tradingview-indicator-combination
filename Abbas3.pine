@@ -898,7 +898,6 @@ string SHOW_FVG              = 'Display fair values gaps on the chart'
 string AUTO_FVG              = 'Filter out non significant fair value gaps'
 string FVG_TF                = 'Fair value gaps timeframe'
 string EXTEND_FVG            = 'Determine how many bars to extend the Fair Value Gap boxes on chart'
-string PED_ZONES             = 'Display premium, discount, and equilibrium zones on chart'
 
 //-----------------------------------------------------------------------------{
 //Settings
@@ -1047,22 +1046,6 @@ fvg_extend = input.int(50, "Extend FVG"
   , minval = 0
   , group = 'Fair Value Gaps'
   , tooltip = EXTEND_FVG)
-
-//----------------------------------------}
-//Premium/Discount zones
-//----------------------------------------{
-show_sd = input(false, 'Premium/Discount Zones'
-  , group = 'Premium & Discount Zones'
-  , tooltip = PED_ZONES)
-
-premium_css = input.color(#f23645, 'Premium Zone'
-  , group = 'Premium & Discount Zones')
-
-eq_css = input.color(#b2b5be, 'Equilibrium Zone'
-  , group = 'Premium & Discount Zones')
-
-discount_css = input.color(#089981, 'Discount Zone'
-  , group = 'Premium & Discount Zones')
 
 //-----------------------------------------------------------------------------}
 //Functions
@@ -1484,61 +1467,6 @@ if show_fvg
         if high > box.get_top(bx)
             box.delete(bx)
             box.delete(array.get(bearish_fvg_min, array.indexof(bearish_fvg_max, bx)))
-
-
-//-----------------------------------------------------------------------------}
-//Premium/Discount/Equilibrium zones
-//-----------------------------------------------------------------------------{
-var premium = box.new(na, na, na, na
-  , bgcolor = color.new(premium_css, 80)
-  , border_color = na)
-
-var premium_lbl = label.new(na, na
-  , text = 'Premium'
-  , color = TRANSP_CSS
-  , textcolor = premium_css
-  , style = label.style_label_down
-  , size = size.small)
-
-var eq = box.new(na, na, na, na
-  , bgcolor = color.rgb(120, 123, 134, 80)
-  , border_color = na)
-
-var eq_lbl = label.new(na, na
-  , text = 'Equilibrium'
-  , color = TRANSP_CSS
-  , textcolor = eq_css
-  , style = label.style_label_left
-  , size = size.small)
-
-var discount = box.new(na, na, na, na
-  , bgcolor = color.new(discount_css, 80)
-  , border_color = na)
-
-var discount_lbl = label.new(na, na
-  , text = 'Discount'
-  , color = TRANSP_CSS
-  , textcolor = discount_css
-  , style = label.style_label_up
-  , size = size.small)
-
-//Show Premium/Discount Areas
-if barstate.islast and show_sd
-    avg = math.avg(trail_up, trail_dn)
-
-    box.set_lefttop(premium, math.max(top_x, btm_x), trail_up)
-    box.set_rightbottom(premium, n, .95 * trail_up + .05 * trail_dn)
-
-    label.set_xy(premium_lbl, int(math.avg(math.max(top_x, btm_x), n)), trail_up)
-
-    box.set_lefttop(eq, math.max(top_x, btm_x), .525 * trail_up + .475*trail_dn)
-    box.set_rightbottom(eq, n, .525 * trail_dn + .475 * trail_up)
-
-    label.set_xy(eq_lbl, n, avg)
-    
-    box.set_lefttop(discount, math.max(top_x, btm_x), .95 * trail_dn + .05 * trail_up)
-    box.set_rightbottom(discount, n, trail_dn)
-    label.set_xy(discount_lbl, int(math.avg(math.max(top_x, btm_x), n)), trail_dn)
 
 //-----------------------------------------------------------------------------}
 //Trend
