@@ -27,6 +27,7 @@ high_low_color 		= input.color(color.new(color.blue, 50), "High-low lines color"
 volume_bars_color = input.color(color.new(color.green, 70), "Volume bars color", group = "Periodic Volume Profile")
 sup_color 			  = input.color(color.new(color.red, 10), "Support line color", group = "Periodic Volume Profile")
 res_color 			  = input.color(color.new(color.green, 10),"Resistance line color", group = "Periodic Volume Profile")
+bar_count         = input.int(100, "Bar Count", minval = 40, group = "Periodic Volume Profile")
 
 range_prices = array.new_float((resolution + 1), 0.0)
 partial_vol = array.new_float(resolution, 0.0)
@@ -139,7 +140,7 @@ if is_first_inRange or barstate.islast
 	diff_t=0
 	x1=0.0
 	norm_vol=0.0
-	proportion=resolution/40
+	proportion=resolution/bar_count
 	for i = 0 to (resolution - 1)
 		y=array.get(range_prices,i)
 		current_vol= array.get(total_vol,i)
