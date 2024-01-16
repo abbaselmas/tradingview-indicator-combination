@@ -1,5 +1,5 @@
 //@version=5
-indicator(title='PVP | nPOCs | Key Levels', shorttitle='Abbas3', overlay=true, precision=4, linktoseries=true, max_bars_back=1000, max_lines_count=500)
+indicator(title='PVP | nPOCs | Key Levels', shorttitle='Abbas3', overlay=true, linktoseries=true)
 
 //Periodic Volume Profile
 var bool is_first_candle= true
@@ -12,21 +12,21 @@ ys=0.0
 int bar_offset=0
 var is_first_inRange=false
 
-period_time   		= input.int(8, "Number of days (Min: 3, Max: 500)", minval = 3, maxval = 500, group = "Periodic Volume Profile")
+period_time   		= input.int(8, "Number of days (Min: 3, Max: 500)", minval = 3, maxval = 20, group = "Periodic Volume Profile")
 resolution   		  = input.int(700, "calculation resolution (Min: 400, Max: 700)", minval  = 400, maxval  = 700, group = "Periodic Volume Profile")
 show_from   		  = input.int(3, "show support/resistance since (Min: 2, Max: 45)", minval  = 2, maxval  = 45, group = "Periodic Volume Profile")
 show_volume_bars  = input.bool(false, "Show volume bars (If selected, maximum days are 17)", group = "Periodic Volume Profile")
 show_vpoc_line   	= input.bool(true, "Show VPOC line", group = "Periodic Volume Profile")
-show_support_line = input.bool(false, "Show support line", group = "Periodic Volume Profile")
-show_res_line   	= input.bool(false, "Show resistance line", group = "Periodic Volume Profile")
+// show_support_line = input.bool(false, "Show support line", group = "Periodic Volume Profile")
+// show_res_line   	= input.bool(false, "Show resistance line", group = "Periodic Volume Profile")
 show_H_line   		= input.bool(false, "Show high line", group = "Periodic Volume Profile")
 show_L_line  		  = input.bool(false, "Show low line", group = "Periodic Volume Profile")
-show_labels   		= input.bool(false, "Show from days label", group = "Periodic Volume Profile")
+// show_labels   		= input.bool(false, "Show from days label", group = "Periodic Volume Profile")
 vpoc_color   		  = input.color(color.new(#FF0015, 10), "VPOC color", group = "Periodic Volume Profile")
 high_low_color 		= input.color(color.new(color.blue, 50), "High-low lines color", group = "Periodic Volume Profile")
 volume_bars_color = input.color(color.new(color.green, 70), "Volume bars color", group = "Periodic Volume Profile")
-sup_color 			  = input.color(color.new(color.red, 10), "Support line color", group = "Periodic Volume Profile")
-res_color 			  = input.color(color.new(color.green, 10),"Resistance line color", group = "Periodic Volume Profile")
+// sup_color 			  = input.color(color.new(color.red, 10), "Support line color", group = "Periodic Volume Profile")
+// res_color 			  = input.color(color.new(color.green, 10),"Resistance line color", group = "Periodic Volume Profile")
 bar_count         = input.int(100, "Bar Count", minval = 40, group = "Periodic Volume Profile")
 
 range_prices = array.new_float((resolution + 1), 0.0)
@@ -113,19 +113,19 @@ if is_first_inRange or barstate.islast
 		array.shift(ys_time)
 		array.push(ys_time, t) 
 
-if barstate.islast
-	for i=0 to (show_from - 1)
-		ys := array.get(all_ys, i)
-		time_back = array.get(ys_time, i)
-		if array.get(is_support, i)
-			if show_support_line
-				line.new(x1=int(time_back), y1=ys, x2=time + 86400000, y2=ys, color=sup_color ,xloc= xloc.bar_time, extend = extend.none, width=2, style=line.style_dashed)
-		else
-			if show_res_line
-				line.new(x1=int(time_back), y1=ys, x2=time + 86400000, y2=ys, color=res_color ,xloc= xloc.bar_time, extend = extend.none, width=2, style=line.style_dashed)
+// if barstate.islast
+// 	for i=0 to (show_from - 1)
+// 		ys := array.get(all_ys, i)
+// 		time_back = array.get(ys_time, i)
+// 		if array.get(is_support, i)
+// 			if show_support_line
+// 				line.new(x1=int(time_back), y1=ys, x2=time + 86400000, y2=ys, color=sup_color ,xloc= xloc.bar_time, extend = extend.none, width=2, style=line.style_dashed)
+// 		else
+// 			if show_res_line
+// 				line.new(x1=int(time_back), y1=ys, x2=time + 86400000, y2=ys, color=res_color ,xloc= xloc.bar_time, extend = extend.none, width=2, style=line.style_dashed)
 			
-		if show_labels    
-			label.new(int(time + 86400000), ys, text ="From days: " + str.tostring(show_from - i), xloc=xloc.bar_time)
+// 		if show_labels    
+// 			label.new(int(time + 86400000), ys, text ="From days: " + str.tostring(show_from - i), xloc=xloc.bar_time)
 	
 dif_time=0.0
 
@@ -892,9 +892,9 @@ string CONFLUENCE_FILTER     = 'Filter non significant internal structure breako
 string SHOW_SWING            = 'Display swing market Structure'
 string SHOW_SWING_POINTS     = 'Display swing point as labels on the chart'
 string SHOW_SWHL_POINTS      = 'Highlight most recent strong and weak high/low points on the chart'
-string SHOW_EQHL             = 'Display equal highs and equal lows on the chart'
-string EQHL_BARS             = 'Number of bars used to confirm equal highs and equal lows'
-string EQHL_THRESHOLD        = 'Sensitivity threshold in a range (0, 1) used for the detection of equal highs & lows\n\nLower values will return fewer but more pertinent results'
+// string SHOW_EQHL             = 'Display equal highs and equal lows on the chart'
+// string EQHL_BARS             = 'Number of bars used to confirm equal highs and equal lows'
+// string EQHL_THRESHOLD        = 'Sensitivity threshold in a range (0, 1) used for the detection of equal highs & lows\n\nLower values will return fewer but more pertinent results'
 string SHOW_FVG              = 'Display fair values gaps on the chart'
 string AUTO_FVG              = 'Filter out non significant fair value gaps'
 string FVG_TF                = 'Fair value gaps timeframe'
@@ -999,28 +999,28 @@ show_hl_swings = input(true, 'Show Strong/Weak High/Low'
   , group = 'Real Time Swing Structure'
   , tooltip = SHOW_SWHL_POINTS)
 
-//----------------------------------------}
-//EQH/EQL
-//----------------------------------------{
-show_eq = input(true, 'Equal High/Low'
-  , group = 'EQH/EQL'
-  , tooltip = SHOW_EQHL)
+// //----------------------------------------}
+// //EQH/EQL
+// //----------------------------------------{
+// show_eq = input(true, 'Equal High/Low'
+//   , group = 'EQH/EQL'
+//   , tooltip = SHOW_EQHL)
 
-eq_len = input.int(3, 'Bars Confirmation'
-  , minval = 1
-  , group = 'EQH/EQL'
-  , tooltip = EQHL_BARS)
+// eq_len = input.int(3, 'Bars Confirmation'
+//   , minval = 1
+//   , group = 'EQH/EQL'
+//   , tooltip = EQHL_BARS)
 
-eq_threshold = input.float(0.05, 'Threshold'
-  , minval = 0
-  , maxval = 0.5
-  , step = 0.01
-  , group = 'EQH/EQL'
-  , tooltip = EQHL_THRESHOLD)
+// eq_threshold = input.float(0.05, 'Threshold'
+//   , minval = 0
+//   , maxval = 0.5
+//   , step = 0.01
+//   , group = 'EQH/EQL'
+//   , tooltip = EQHL_THRESHOLD)
 
-eq_size = input.string('Tiny', 'Label Size'
-  , options = ['Tiny', 'Small', 'Normal']
-  , group = 'EQH/EQL')
+// eq_size = input.string('Tiny', 'Label Size'
+//   , options = ['Tiny', 'Small', 'Normal']
+//   , group = 'EQH/EQL')
 
 //----------------------------------------}
 //Fair Value Gaps
@@ -1144,11 +1144,11 @@ var swing_structure_lbl_size = swing_structure_size == 'Tiny'
   ? size.small 
   : size.normal 
 
-var eqhl_lbl_size = eq_size == 'Tiny' 
-  ? size.tiny 
-  : eq_size == 'Small' 
-  ? size.small
-  : size.normal 
+// var eqhl_lbl_size = eq_size == 'Tiny' 
+//   ? size.tiny 
+//   : eq_size == 'Small' 
+//   ? size.small
+//   : size.normal 
 
 //Swings
 [top, btm] = swings(length)
@@ -1346,62 +1346,62 @@ if ta.crossunder(close, btm_y) and btm_cross
     btm_cross := false
     trend := -1
 
-//-----------------------------------------------------------------------------}
-//EQH/EQL
-//-----------------------------------------------------------------------------{
-var eq_prev_top = 0.
-var eq_top_x = 0
+// //-----------------------------------------------------------------------------}
+// //EQH/EQL
+// //-----------------------------------------------------------------------------{
+// var eq_prev_top = 0.
+// var eq_top_x = 0
 
-var eq_prev_btm = 0.
-var eq_btm_x = 0
+// var eq_prev_btm = 0.
+// var eq_btm_x = 0
 
-if show_eq
-    eq_top = ta.pivothigh(eq_len, eq_len)
-    eq_btm = ta.pivotlow(eq_len, eq_len)
+// if show_eq
+//     eq_top = ta.pivothigh(eq_len, eq_len)
+//     eq_btm = ta.pivotlow(eq_len, eq_len)
 
-    if eq_top 
-        max = math.max(eq_top, eq_prev_top)
-        min = math.min(eq_top, eq_prev_top)
+//     if eq_top 
+//         max = math.max(eq_top, eq_prev_top)
+//         min = math.min(eq_top, eq_prev_top)
         
-        if max < min + atr * eq_threshold
-            eqh_line = line.new(eq_top_x, eq_prev_top, n-eq_len, eq_top
-              , color = bear_css
-              , style = line.style_dotted)
+//         if max < min + atr * eq_threshold
+//             eqh_line = line.new(eq_top_x, eq_prev_top, n-eq_len, eq_top
+//               , color = bear_css
+//               , style = line.style_dotted)
 
-            eqh_lbl = label.new(int(math.avg(n-eq_len, eq_top_x)), eq_top, 'EQH'
-              , color = #00000000
-              , textcolor = bear_css
-              , style = label.style_label_down
-              , size = eqhl_lbl_size)
+//             eqh_lbl = label.new(int(math.avg(n-eq_len, eq_top_x)), eq_top, 'EQH'
+//               , color = #00000000
+//               , textcolor = bear_css
+//               , style = label.style_label_down
+//               , size = eqhl_lbl_size)
 
-            if mode == 'Present'
-                line.delete(eqh_line[1])
-                label.delete(eqh_lbl[1])
+//             if mode == 'Present'
+//                 line.delete(eqh_line[1])
+//                 label.delete(eqh_lbl[1])
             
-        eq_prev_top := eq_top
-        eq_top_x := n-eq_len
+//         eq_prev_top := eq_top
+//         eq_top_x := n-eq_len
 
-    if eq_btm 
-        max = math.max(eq_btm, eq_prev_btm)
-        min = math.min(eq_btm, eq_prev_btm)
+//     if eq_btm 
+//         max = math.max(eq_btm, eq_prev_btm)
+//         min = math.min(eq_btm, eq_prev_btm)
         
-        if min > max - atr * eq_threshold
-            eql_line = line.new(eq_btm_x, eq_prev_btm, n-eq_len, eq_btm
-              , color = bull_css
-              , style = line.style_dotted)
+//         if min > max - atr * eq_threshold
+//             eql_line = line.new(eq_btm_x, eq_prev_btm, n-eq_len, eq_btm
+//               , color = bull_css
+//               , style = line.style_dotted)
 
-            eql_lbl = label.new(int(math.avg(n-eq_len, eq_btm_x)), eq_btm, 'EQL'
-              , color = #00000000
-              , textcolor = bull_css
-              , style = label.style_label_up
-              , size = eqhl_lbl_size)
+//             eql_lbl = label.new(int(math.avg(n-eq_len, eq_btm_x)), eq_btm, 'EQL'
+//               , color = #00000000
+//               , textcolor = bull_css
+//               , style = label.style_label_up
+//               , size = eqhl_lbl_size)
 
-            if mode == 'Present'
-                line.delete(eql_line[1])
-                label.delete(eql_lbl[1])
+//             if mode == 'Present'
+//                 line.delete(eql_line[1])
+//                 label.delete(eql_lbl[1])
 
-        eq_prev_btm := eq_btm
-        eq_btm_x := n-eq_len
+//         eq_prev_btm := eq_btm
+//         eq_btm_x := n-eq_len
 
 //-----------------------------------------------------------------------------}
 //Fair Value Gaps
