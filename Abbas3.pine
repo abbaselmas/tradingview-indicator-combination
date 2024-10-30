@@ -12,261 +12,207 @@ ys=0.0
 int bar_offset=0
 var is_first_inRange=false
 
-period_time   		= input.int(8, "Number of days (Min: 3, Max: 500)", minval = 3, maxval = 20, group = "Periodic Volume Profile")
-resolution   		  = input.int(700, "calculation resolution (Min: 400, Max: 700)", minval  = 400, maxval  = 700, group = "Periodic Volume Profile")
-show_from   		  = input.int(3, "show support/resistance since (Min: 2, Max: 45)", minval  = 2, maxval  = 45, group = "Periodic Volume Profile")
-show_volume_bars  = input.bool(false, "Show volume bars (If selected, maximum days are 17)", group = "Periodic Volume Profile")
-show_vpoc_line   	= input.bool(true, "Show VPOC line", group = "Periodic Volume Profile")
-// show_support_line = input.bool(false, "Show support line", group = "Periodic Volume Profile")
-// show_res_line   	= input.bool(false, "Show resistance line", group = "Periodic Volume Profile")
-show_H_line   		= input.bool(false, "Show high line", group = "Periodic Volume Profile")
-show_L_line  		  = input.bool(false, "Show low line", group = "Periodic Volume Profile")
-// show_labels   		= input.bool(false, "Show from days label", group = "Periodic Volume Profile")
-vpoc_color   		  = input.color(color.new(#FF0015, 10), "VPOC color", group = "Periodic Volume Profile")
-high_low_color 		= input.color(color.new(color.blue, 50), "High-low lines color", group = "Periodic Volume Profile")
+period_time   	  = input.int(7, "Number of days (Min: 3, Max: 15)", minval = 3, maxval = 15, group = "Periodic Volume Profile")
+resolution   	  = input.int(400, "calculation resolution (Min: 400, Max: 700)", minval  = 100, maxval  = 700, group = "Periodic Volume Profile")
+show_from   	  = input.int(2, "show support/resistance since (Min: 2, Max: 45)", minval  = 2, maxval  = 45, group = "Periodic Volume Profile")
+show_volume_bars  = input.bool(true, "Show volume bars", group = "Periodic Volume Profile")
+show_vpoc_line    = input.bool(true, "Show VPOC line", group = "Periodic Volume Profile")
+show_support_line = input.bool(false, "Show support line", group = "Periodic Volume Profile")
+show_res_line     = input.bool(false, "Show resistance line", group = "Periodic Volume Profile")
+show_H_line   	  = input.bool(false, "Show high line", group = "Periodic Volume Profile")
+show_L_line  	  = input.bool(false, "Show low line", group = "Periodic Volume Profile")
+show_labels   	  = input.bool(false, "Show from days label", group = "Periodic Volume Profile")
+vpoc_color   	  = input.color(color.new(#FF0015, 10), "VPOC color", group = "Periodic Volume Profile")
+high_low_color 	  = input.color(color.new(color.blue, 50), "High-low lines color", group = "Periodic Volume Profile")
 volume_bars_color = input.color(color.new(color.green, 70), "Volume bars color", group = "Periodic Volume Profile")
-// sup_color 			  = input.color(color.new(color.red, 10), "Support line color", group = "Periodic Volume Profile")
-// res_color 			  = input.color(color.new(color.green, 10),"Resistance line color", group = "Periodic Volume Profile")
-bar_count         = input.int(100, "Bar Count", minval = 40, group = "Periodic Volume Profile")
+sup_color 		  = input.color(color.new(color.red, 10), "Support line color", group = "Periodic Volume Profile")
+res_color 		  = input.color(color.new(color.green, 10),"Resistance line color", group = "Periodic Volume Profile")
+bar_count         = input.int(400, "Bar Count", minval = 40, group = "Periodic Volume Profile")
 
-range_prices = array.new_float((resolution + 1), 0.0)
-partial_vol = array.new_float(resolution, 0.0)
-total_vol = array.new_float(resolution, 0.0)
-var all_ys = array.new_float(show_from, 0.0)
-var ys_time = array.new_float(show_from, 0.0)
-var is_support = array.new_bool(show_from, true)
+range_prices    = array.new_float(resolution+1, 0.0)
+partial_vol     = array.new_float(resolution, 0.0)
+total_vol       = array.new_float(resolution, 0.0)
+var all_ys      = array.new_float(show_from, 0.0)
+var ys_time     = array.new_float(show_from, 0.0)
+var is_support  = array.new_bool(show_from, true)
 
 t = time("1440", session.regular)
-var int startTime =time
-int ncandles =0
+var int startTime = time
+int ncandles = 0
 
 if barstate.isfirst
-	startTime := timenow - period_time*86400000
+    startTime := timenow - period_time * 86400000
 
-bar_offset:= ta.barssince(is_first_inRange)
+bar_offset := math.max(1, nz(ta.barssince(is_first_inRange), 1))  // Ensure minimum value of 1
 is_first = na(t[1]) and not na(t) or t[1] < t
-is_first_inRange:=is_first and t>startTime
-high_price=0.0
-low_price=0.0
-price_level=0.0
+is_first_inRange := is_first and t > startTime
+high_price = 0.0
+low_price = 0.0
+price_level = 0.0
 
-if is_first_inRange or barstate.islast
-	
-	last_time:= t[1]
-	ncandles := bar_offset
-	current_low_price=0.0
-	for i = 1 to (ncandles)
-		current_low_price:=low[i]
-		if current_low_price < low_price or low_price==0.0
-			low_price:=current_low_price
-			
-	current_high_price=0.0
-	for i = 1 to (ncandles)
-		current_high_price:=high[i]
-		if current_high_price >high_price or high_price==0.0
-			high_price:=current_high_price
-	diff := (high_price-low_price)/resolution
-	
-	for j = 0 to (resolution)
-		array.set(range_prices, (j), (low_price + (diff * (j+1))))
-	
-	for i = 0 to (ncandles)
-		int w_candle = 0
-		array.fill(partial_vol, 0.0)
-		
-		for j=0 to (resolution-1)
-			float current_price = array.get(range_prices, j)
-			if high[i] > current_price and low[i] < current_price
-				float j_partial_vol = array.get(partial_vol, j)
-				float sum_vol = j_partial_vol + nz(volume[i])
-				array.set(partial_vol, j, sum_vol)
-				w_candle := w_candle + 1
-		
-		for j = 0 to (resolution - 1)
-			float j_total_vol = array.get(total_vol, j)
-			float j_partial_vol = array.get(partial_vol, j)
-			float sum_partial_total=0.0
-			if w_candle > 0
-				sum_partial_total := j_total_vol + j_partial_vol/w_candle
-			else 
-				sum_partial_total := j_total_vol
-			array.set(total_vol, j, sum_partial_total)
-	maxV := array.max(total_vol)
-	maxV_index := array.indexof(total_vol, maxV)
-	
-	if is_first_inRange
-		price_level:=diff*maxV_index+low_price
-		if high_price - price_level > price_level - low_price
-			margin:=high_price - price_level
-			ys:=price_level - margin
-		else
-			margin:=price_level - low_price
-			ys:=price_level + margin
-		if ys > high_price
-			array.shift(is_support)
-			array.push(is_support, false)
-		else
-			array.shift(is_support)
-			array.push(is_support, true)
-		array.shift(all_ys)
-		array.push(all_ys, ys)
-		array.shift(ys_time)
-		array.push(ys_time, t) 
+// Optimized main calculation block
+if (is_first_inRange or barstate.islast) and not barstate.isrealtime
+    last_time := t[1]
+    ncandles := math.min(bar_offset, 500) // Limit maximum lookback
+    
+    // Optimize high/low calculation
+    high_price := ta.highest(high, ncandles)
+    low_price := ta.lowest(low, ncandles)
+    diff := (high_price - low_price) / resolution
+    
+    // Optimize price range calculation
+    for j = 0 to resolution
+        array.set(range_prices, j, low_price + (diff * j))
+    
+    // Optimize volume profile calculation
+    array.fill(total_vol, 0.0)
+    
+    for i = 0 to ncandles - 1
+        int w_candle = 0
+        array.fill(partial_vol, 0.0)
+        float vol_value = nz(volume[i])
+        float h = high[i]
+        float l = low[i]
+        
+        // Optimize inner loop with early exit conditions
+        for j = 0 to resolution - 1
+            float current_price = array.get(range_prices, j)
+            if h > current_price and l < current_price
+                array.set(partial_vol, j, vol_value)
+                w_candle := w_candle + 1
+        
+        if w_candle > 0
+            float vol_per_candle = 1.0 / math.max(w_candle, 1)
+            for j = 0 to resolution - 1
+                array.set(total_vol, j, array.get(total_vol, j) + array.get(partial_vol, j) * vol_per_candle)
+    
+    maxV := array.max(total_vol)
+    maxV_index := array.indexof(total_vol, maxV)
+    
+    if is_first_inRange
+        price_level := diff * maxV_index + low_price
+        margin := math.max(high_price - price_level, price_level - low_price)
+        ys := price_level + (high_price - price_level > price_level - low_price ? -margin : margin)
+        
+        array.shift(is_support)
+        array.push(is_support, ys <= high_price)
+        array.shift(all_ys)
+        array.push(all_ys, ys)
+        array.shift(ys_time)
+        array.push(ys_time, t)
 
-// if barstate.islast
-// 	for i=0 to (show_from - 1)
-// 		ys := array.get(all_ys, i)
-// 		time_back = array.get(ys_time, i)
-// 		if array.get(is_support, i)
-// 			if show_support_line
-// 				line.new(x1=int(time_back), y1=ys, x2=time + 86400000, y2=ys, color=sup_color ,xloc= xloc.bar_time, extend = extend.none, width=2, style=line.style_dashed)
-// 		else
-// 			if show_res_line
-// 				line.new(x1=int(time_back), y1=ys, x2=time + 86400000, y2=ys, color=res_color ,xloc= xloc.bar_time, extend = extend.none, width=2, style=line.style_dashed)
-			
-// 		if show_labels    
-// 			label.new(int(time + 86400000), ys, text ="From days: " + str.tostring(show_from - i), xloc=xloc.bar_time)
-	
-dif_time=0.0
+// Optimized visualization
+if (is_first_inRange or barstate.islast) and not barstate.isrealtime
+    int dif_time = (time - last_time) / (show_volume_bars ? 3 : 9)
+    int proportion = resolution / bar_count
+    
+    // Optimize volume bars drawing
+    if show_volume_bars
+        for i = 0 to resolution - 1
+            if i % math.max(1, int(proportion)) == 0
+                y = array.get(range_prices, i)
+                norm_vol = array.get(total_vol, i) / maxV
+                x1 = dif_time * norm_vol
+                diff_t = last_time + int(x1)
+                line.new(x1=t[1], y1=y, x2=diff_t, y2=y, color=volume_bars_color, xloc=xloc.bar_time, extend=extend.none, width=2)
+    
+    // Draw main lines
+    if show_L_line    
+        line.new(x1=t[1], y1=low_price, x2=time, y2=low_price, xloc=xloc.bar_time, color=high_low_color)
+    if show_vpoc_line
+        line.new(x1=t[1], y1=diff*maxV_index+low_price, x2=time, y2=diff*maxV_index+low_price, color=vpoc_color, width=2, xloc=xloc.bar_time)
+    if show_H_line 
+        line.new(x1=t[1], y1=high_price, x2=time, y2=high_price, xloc=xloc.bar_time, color=high_low_color)
 
-if is_first_inRange or barstate.islast
-
-	last_time:= int(t[1])
-	dif_time:= (time-last_time)
-	if dif_time/86400000 > 1.5
-		dif_time:=(dif_time)/9
-	else
-		dif_time:=(dif_time)/3
-	diff_t=0
-	x1=0.0
-	norm_vol=0.0
-	proportion=resolution/bar_count
-	for i = 0 to (resolution - 1)
-		y=array.get(range_prices,i)
-		current_vol= array.get(total_vol,i)
-		norm_vol :=current_vol/maxV
-		x1 :=dif_time*norm_vol
-		diff_t := last_time + int(x1)
-		if (i % int(proportion) == 0 or int(proportion) == 0) and show_volume_bars
-			line.new(x1=t[1], y1=y, x2=diff_t, y2=y, color=volume_bars_color ,xloc= xloc.bar_time, extend = extend.none, width=2)
-
-	if show_L_line    
-		line.new(x1=t[1], y1=low_price, x2=time, y2=low_price,xloc= xloc.bar_time, color=high_low_color)
-	if show_vpoc_line
-		line.new(x1=t[1], y1=diff*maxV_index+low_price, x2=time, y2=diff*maxV_index+low_price, color=vpoc_color, width=2,xloc= xloc.bar_time)
-	if show_H_line 
-		line.new(x1=t[1], y1=high_price, x2=time, y2=high_price,xloc= xloc.bar_time, color=high_low_color)
-
-////////////////////////////////////////////////////////////////////////////////////////
-
-//npoc chart champs
+//nPOC Optimized
 show_nPOCs = input.bool(true, title='Show Naked POCs', group='Naked Point of Control Settings')
 dtf = input.timeframe('D', title='nPOC - Time Frame', group='Naked Point of Control Settings')
-symbol_resolution = input.float(0.0000001, title='Resolution (Change resolution to Symbol decimal)', group='Symbol Settings', tooltip='E.g. BTC = 1, APE = 0.01, OPTUSD = 0.0001')
-
+symbol_resolution = input.float(0.0001, title='Resolution', group='Symbol Settings')
 show_nPOCs_color = input.color(color.new(#F236BA, 10), title='nPOC - Color', group='Naked Point of Control Settings')
 
-is_new_bar(t) =>
-	ta.change(time(t)) != 0
-round_to_nearest(v, x) =>
-	math.round(v / x) * x
+// Optimized nPOC calculations
+var float[] a = array.new_float(0)
+var max_array_size = 1000
 
-tick_size = math.max(syminfo.mintick, symbol_resolution)
-
-var a = array.new_float(0)
+round_to_nearest(v, x) => math.round(v / x) * x
 
 a_min = 0.0
-a_min := nz(a_min[1], round_to_nearest(low, tick_size))
+a_min := nz(a_min[1], round_to_nearest(low, symbol_resolution))
 a_max = 0.0
-a_max := nz(a_max[1], round_to_nearest(high, tick_size))
+a_max := nz(a_max[1], round_to_nearest(high, symbol_resolution))
 
+is_new_bar(t) => ta.change(time(t)) != 0
 d_switch = is_new_bar(dtf)
 
-if d_switch
-	a_min := low
-	a_max := high
-	array.clear(a)
+if d_switch and barstate.isconfirmed
+    a_min := low
+    a_max := high
+    array.clear(a)
 
-// Scaled min max
+tick_size = math.max(syminfo.mintick, symbol_resolution)
 v_min = int(round_to_nearest(low - a_min, tick_size) / tick_size)
 v_max = int(round_to_nearest(high - a_min, tick_size) / tick_size)
 
-// Scaled candle range
-ticks = v_max - v_min
+// Limit array size
+ticks = math.min(v_max - v_min, max_array_size)
+vol = volume / math.max(ticks, 1)
 
-vol = volume / (ticks == 0 ? 1 : ticks)
+if barstate.isconfirmed
+    for i = math.max(v_min, -max_array_size) to math.min(v_max - 1, max_array_size)
+        idx = i - v_min
+        if idx >= 0 and idx < array.size(a)
+            array.set(a, idx, array.get(a, idx) + vol)
+        else if idx >= 0
+            array.push(a, vol)
 
-for i = v_min to math.max(v_max - 1, v_min) by 1
-	// Insert new low value
-	if i < 0
-		array.insert(a, i - v_min, vol)
-		continue
-
-	// Adjust index
-	offset = v_min < 0 ? math.abs(v_min) : 0
-	index = int(i + offset)
-
-	// Push new high value
-	if index >= array.size(a)
-		array.push(a, vol)
-		continue
-
-	// Update existing value
-	v = array.get(a, index)
-	array.set(a, index, v + vol)
-
-// Array bounds
-a_min := math.min(a_min, round_to_nearest(low, tick_size))
-a_max := math.max(a_max, round_to_nearest(high, tick_size))
-a_size = array.size(a)
-
-// POC
-poc_index = -1
-poc_prev = -1.0
-sum_vol = 0.0
-
-for i = 0 to a_size - 1 by 1
-	poc_current = array.get(a, i)
-	sum_vol += poc_current
-
-	if poc_current > poc_prev
-		poc_prev := poc_current
-		poc_index := i
-		poc_index
-
+// Optimized POC calculation
+poc_index = array.indexof(a, array.max(a))
 float p_poc = 0.0
 float d_poc = 0.0
-float b_poc = 0.0
 
 d_poc := poc_index * tick_size + a_min
 p_poc := is_new_bar(dtf) ? d_poc[1] : p_poc[1]
 
+// Optimized line management
+var max_lines = 50
 var line[] uplines = array.new_line()
 var float[] uppocs = array.new_float()
-
-if is_new_bar(dtf) and show_nPOCs
-	array.push(uplines, line.new(time, p_poc, time + 1, p_poc, xloc=xloc.bar_time, color=show_nPOCs_color, extend=extend.right))
-	array.push(uppocs, p_poc)
-
-if array.size(uppocs) > 0
-	for i = 0 to array.size(uppocs) - 1 by 1
-		myuppoc = array.get(uppocs, i)
-		if myuppoc > low
-			line.delete(array.get(uplines, i))
-
 var line[] downlines = array.new_line()
 var float[] downpocs = array.new_float()
 
-if is_new_bar(dtf) and show_nPOCs
-	array.push(downlines, line.new(time, p_poc, time + 1, p_poc, xloc=xloc.bar_time, color=show_nPOCs_color, extend=extend.right))
-	array.push(downpocs, p_poc)
+if is_new_bar(dtf) and show_nPOCs and barstate.isconfirmed
+    // Manage uplines
+    if array.size(uplines) > max_lines
+        line.delete(array.get(uplines, 0))
+        array.remove(uplines, 0)
+        array.remove(uppocs, 0)
+    
+    array.push(uplines, line.new(time, p_poc, time + 1, p_poc, xloc=xloc.bar_time, color=show_nPOCs_color, extend=extend.right))
+    array.push(uppocs, p_poc)
+    
+    // Manage downlines
+    if array.size(downlines) > max_lines
+        line.delete(array.get(downlines, 0))
+        array.remove(downlines, 0)
+        array.remove(downpocs, 0)
+    
+    array.push(downlines, line.new(time, p_poc, time + 1, p_poc, xloc=xloc.bar_time, color=show_nPOCs_color, extend=extend.right))
+    array.push(downpocs, p_poc)
+
+// Clean up lines
+if array.size(uppocs) > 0
+    for i = array.size(uppocs) - 1 to 0
+        if array.get(uppocs, i) > low
+            line.delete(array.get(uplines, i))
+            array.remove(uplines, i)
+            array.remove(uppocs, i)
 
 if array.size(downpocs) > 0
-	for i = 0 to array.size(downpocs) - 1 by 1
-		mydownpoc = array.get(downpocs, i)
-		if mydownpoc < high
-			line.delete(array.get(downlines, i))
-///////////////////
+    for i = array.size(downpocs) - 1 to 0
+        if array.get(downpocs, i) < high
+            line.delete(array.get(downlines, i))
+            array.remove(downlines, i)
+            array.remove(downpocs, i)
 
 //Key Levels
 ///////////////////////////////////////////////////
