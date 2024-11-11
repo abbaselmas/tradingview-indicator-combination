@@ -5,58 +5,43 @@ priceTxt  = str.tostring(close, format.mintick)
 tickerTxt = syminfo.ticker
 
 // Functions  -----------------------------------------------------------------------------------    
-
 f_resInMinutes() =>
     _resInMinutes = timeframe.multiplier * (timeframe.isseconds ? 1. / 60 : timeframe.isminutes ? 1. : timeframe.isdaily ? 60. * 24 : timeframe.isweekly ? 60. * 24 * 7 : timeframe.ismonthly ? 60. * 24 * 30.4375 : na)
     _resInMinutes
-
 f_tfResInMinutes(_res) =>
     request.security(syminfo.tickerid, _res, f_resInMinutes())
-
 f_tfIsIntraday(_res) =>
     [intraday, daily, weekly, monthly] = request.security(syminfo.tickerid, _res, [timeframe.isintraday, timeframe.isdaily, timeframe.isweekly, timeframe.ismonthly])
     check = intraday ? "Intraday" : daily ? "Daily" : weekly ? "Weekly" : monthly ? "Monthly" : "Error" 
     check
-
 f_drawOnlyLineX(_x1, _y1, _x2, _y2, _xloc, _extend, _color, _style, _width) =>
     id = line.new(_x1, _y1, _x2, _y2, _xloc, _extend, _color, _style, _width)
-
 f_drawLineX(_x1, _y1, _x2, _y2, _xloc, _extend, _color, _style, _width) =>
     var id = line.new(_x1, _y1, _x2, _y2, _xloc, _extend, _color, _style, _width)
     line.set_xy1(id, _x1, _y1)
     line.set_xy2(id, _x2, _y2)
     line.set_color(id, _color)
     id
-
 f_drawOnlyBoxX(_left, _top, _right, _bottom, _border_color, _border_width, _border_style) =>
     box.new(_left, _top, _right, _bottom, _border_color, _border_width, _border_style, bgcolor=_border_color)
-
 f_drawOnlyLabelX(_x, _y, _text, _xloc, _yloc, _color, _style, _textcolor, _size, _textalign, _tooltip) =>
     label.new(_x, _y, _text, _xloc, _yloc, _color, _style, _textcolor, _size, _textalign, _tooltip)
-
 f_drawLabelX(_x, _y, _text, _xloc, _yloc, _color, _style, _textcolor, _size, _textalign, _tooltip) =>
     var id = label.new(_x, _y, _text, _xloc, _yloc, _color, _style, _textcolor, _size, _textalign, _tooltip)
     label.set_xy(id, _x, _y)
     label.set_text(id, _text)
     label.set_tooltip(id, _tooltip)
-
 f_getHighLow(_len, _calc, _offset) =>
     if _calc
         htf_l = low [_offset]
         htf_h = high[_offset]
         vol   = 0.
-        
         if _len > 0
             for x = 0 to _len - 1
                 htf_l := math.min(low [_offset + x], htf_l)
                 htf_h := math.max(high[_offset + x], htf_h)
                 vol += volume[_offset + x]
-
-            // htf_l := math.min(low [_offset + _len], htf_l)
-            // htf_h := math.max(high[_offset + _len], htf_h)
-        
         [htf_h, htf_l, vol]
-
 f_checkBreaches(arrayOfLines, extend) =>
     int qtyOfLines = array.size(arrayOfLines)
     for lineNo = 0 to (qtyOfLines > 0 ? qtyOfLines - 1 : na)
@@ -65,18 +50,13 @@ f_checkBreaches(arrayOfLines, extend) =>
             float lineLevel     = line.get_y1(currentLine)
             bool  lineWasCrossed = math.sign(close[1] - lineLevel) != math.sign(close - lineLevel)
             bool  lineWasTouched = math.sign(close[1] - lineLevel) != math.sign(low - lineLevel) or math.sign(close[1] - lineLevel) != math.sign(high - lineLevel) 
-
             if lineWasCrossed and extend == 'Until Bar Cross'
                 array.remove(arrayOfLines, lineNo)
-                // int(na)
             else if lineWasTouched and extend == 'Until Bar Touch'
                 array.remove(arrayOfLines, lineNo)
-                // int(na)
             else
                 line.set_x2(currentLine, bar_index)
-                // int(na)
     int(na)
- 
 f_checkBreaches_alert(arrayOfLines, extend) =>
     poc_alert_id = 0
     int qtyOfLines = array.size(arrayOfLines)
@@ -86,20 +66,15 @@ f_checkBreaches_alert(arrayOfLines, extend) =>
             float lineLevel     = line.get_y1(currentLine)
             bool  lineWasCrossed = math.sign(close[1] - lineLevel) != math.sign(close - lineLevel)
             bool  lineWasTouched = math.sign(close[1] - lineLevel) != math.sign(low - lineLevel) or math.sign(close[1] - lineLevel) != math.sign(high - lineLevel) 
-
             if lineWasCrossed  //and boxNo != qtyOfBoxes - 1
                 poc_alert_id := 1
             else if lineWasTouched //and boxNo != qtyOfBoxes - 1
                 poc_alert_id := 2
-
         poc_alert_id
 
 // Inputs ---------------------------------------------------------------------------------------
-
 group_volume_profile    = 'Periodic Volume Profile'
-
-periodic_tf       = input.timeframe("1 week", "Periodic Timeframe", group = group_volume_profile, tooltip= 'Note that some higher timeframe may not work properly due to maximum historical bars limitation')
-regular_sess      = input.bool(false, 'Profile resets on Regular Session', group = group_volume_profile, tooltip = 'For tickers with Extended Trading Hours')
+periodic_tf       = input.timeframe("W", "Periodic Timeframe", group = group_volume_profile, tooltip= 'Note that some higher timeframe may not work properly due to maximum historical bars limitation')
 
 tooltip_vp        = 'Volume Profile - displays total trading activity over a specified time period at specific price levels'
 volumeProfile     = input.bool(true, 'Volume Profile (Common Interest)', inline='BB3', group = group_volume_profile, tooltip = tooltip_vp)
@@ -119,21 +94,21 @@ pocWidth          = input.int(2, 'Width'                                        
 pocExtend         = input.string('Until Bar Touch', 'Extend Point of Control (PoC)', options=['Until Last Bar', 'Until Bar Cross', 'Until Bar Touch', 'None'], group = group_volume_profile)
 
 tooltip_vah       = 'Value Area High (VAH) - The highest price level within the value area'
-valueAreaHigh     = input.bool(true, 'Value Area High (VAH)'                        , inline='VAH', group = group_volume_profile, tooltip = tooltip_vah)
+valueAreaHigh     = input.bool(false, 'Value Area High (VAH)'                        , inline='VAH', group = group_volume_profile, tooltip = tooltip_vah)
 vahColor          = input.color(color.new(color.blue, 0), ''                      , inline='VAH', group = group_volume_profile)
 
 tooltip_val       = 'Value Area Low (VAL) - The lowest price level within the value area'
-valueAreaLow      = input.bool(true, 'Value Area Low (VAL) '                        , inline='VAL', group = group_volume_profile, tooltip = tooltip_val)
+valueAreaLow      = input.bool(false, 'Value Area Low (VAL) '                        , inline='VAL', group = group_volume_profile, tooltip = tooltip_val)
 valColor          = input.color(color.new(color.blue, 0), ''                      , inline='VAL', group = group_volume_profile)
 
-vaBackground      = input.bool(true, 'Background Fill of Value Area (VA)'           , inline='vBG', group = group_volume_profile)
+vaBackground      = input.bool(false, 'Background Fill of Value Area (VA)'           , inline='vBG', group = group_volume_profile)
 vaBackgroundColor = input.color(color.new(color.blue, 90), ''                     , inline='vBG', group = group_volume_profile)
 
-backgroundFill    = input.bool(true, 'Background Fill of Profile Range'             , inline ='BG', group = group_volume_profile)
+backgroundFill    = input.bool(false, 'Background Fill of Profile Range'             , inline ='BG', group = group_volume_profile)
 backgroundColor   = input.color(color.new(color.blue, 95), ''                     , inline ='BG', group = group_volume_profile)
 
 show_cross        = input.bool(true, 'Show POC Crosses', group = group_volume_profile)
-show_touch        = input.bool(true, 'Show POC Crosses', group = group_volume_profile)
+show_touch        = input.bool(true, 'Show POC Touches', group = group_volume_profile)
 
 show_previous     = input.bool(false, 'Show Previous POC, VAH, VAL', group = group_volume_profile)
 show_dvp          = input.bool(false, 'Show Developing Profile', group = group_volume_profile)
@@ -147,32 +122,25 @@ dval_col          = input.color(color.aqua, '', group = group_volume_profile, in
 
 // Definitions ---------------------------------------------------------------------------------- //
 nzVolume          = nz(volume)
-
 volumeStorageT    = array.new_float(profileLevels + 1, 0.)
-
 var a_poc_lines   = array.new_line()
-
 var x1            = 0
 var x2            = 0
 var levelAbovePoc = 0
 var levelBelowPoc = 0
-var pvtHigh1      = 0.
-var pvtLow1       = 0.
-var pvtLast       = ''
 var pPOC          = 0.
 var pvah          = 0.
 var pval          = 0.
 
 // Calculations --------------------------------------------------------------------------------- 
- 
 min_of_day      = hour * 60 + minute
 intv            = 0
 C_bar           = 0
 bar_start       = false
 period          = f_tfIsIntraday(periodic_tf)
-daily_start     = regular_sess ? ta.barssince(session.isfirstbar_regular) : ta.barssince(session.isfirstbar)
+daily_start     = ta.barssince(ta.change(time("D")))
 weekly_start    = ta.barssince(ta.change(time("W")))
-monthly_start   = ta.barssince(ta.change(time("1M")))
+monthly_start   = ta.barssince(ta.change(time("M")))
 threeM_start    = ta.barssince(ta.change(time("3M")))
 sixM_start      = ta.barssince(ta.change(time("6M")))
 yearly_start    = ta.barssince(ta.change(time("12M")))
@@ -190,22 +158,10 @@ else if period == "Weekly"
     C_bar := weekly_start
     profileLength := weekly_start[1]+1
 else if period == "Monthly"
-    C_bar := periodic_tf == "1M" ? monthly_start : periodic_tf == "3M" ? threeM_start : periodic_tf == "6M" ? sixM_start : periodic_tf == "12M" ? yearly_start : monthly_start
+    C_bar := monthly_start
     profileLength := C_bar[1]+1
 
 bar_start := C_bar == 0
-
-// adjust for regular hour start
-profileLength_adj = ta.barssince((session.islastbar_regular[1]))
-profileLength_adj_ex = ta.barssince((session.isfirstbar_regular))
-if regular_sess 
-    bar_start := bar_start or session.isfirstbar_regular
-    if not session.isfirstbar_regular
-        if syminfo.session == session.regular
-            profileLength :=  math.min(profileLength_adj, profileLength)
-        else
-            profileLength :=  math.min(profileLength_adj_ex, profileLength)
-
 proceed = bar_start
 
 if proceed
@@ -215,23 +171,10 @@ if proceed
 [priceHighest, priceLowest, tradedVolume] = f_getHighLow(profileLength, proceed, 1)
 priceStep = (priceHighest - priceLowest) / profileLevels
 
-pvtHigh  = priceHighest
-pvtLow   = priceLowest
-
-if not na(pvtHigh)
-    pvtHigh1 := pvtHigh
-    pvtLast  := 'H'
-
-if not na(pvtLow)
-    pvtLow1  := pvtLow
-    pvtLast  := 'L'
-
 if proceed and nzVolume and priceStep > 0 and bar_index > profileLength and profileLength > 0
-
     for barIndexx = 1 to profileLength
         level = 0
         barIndex = barIndexx
-        
         for priceLevel = priceLowest to priceHighest by priceStep
             candleSize = high[barIndex] - low[barIndex]
             if high[barIndex] >= priceLevel and low[barIndex] < priceLevel + priceStep
@@ -244,53 +187,41 @@ if proceed and nzVolume and priceStep > 0 and bar_index > profileLength and prof
                 else if low[barIndex] <= priceLevel
                     array.set(volumeStorageT, level, array.get(volumeStorageT, level) + nzVolume[barIndex] * ((high[barIndex] - priceLevel) / candleSize))
             level += 1
-
     pocLevel          = array.indexof(volumeStorageT, array.max(volumeStorageT))
     totalVolumeTraded = array.sum(volumeStorageT) * isValueArea
     valueArea         = array.get(volumeStorageT, pocLevel)
     levelAbovePoc    := pocLevel
     levelBelowPoc    := pocLevel
-    
     while valueArea < totalVolumeTraded
         if levelBelowPoc == 0 and levelAbovePoc == profileLevels - 1
             break
-
         volumeAbovePoc = 0.
         if levelAbovePoc < profileLevels - 1 
             volumeAbovePoc := array.get(volumeStorageT, levelAbovePoc + 1)
-
         volumeBelowPoc = 0.
         if levelBelowPoc > 0
             volumeBelowPoc := array.get(volumeStorageT, levelBelowPoc - 1)
-        
         if volumeBelowPoc == 0 and volumeAbovePoc == 0
             break
-        
         if volumeAbovePoc >= volumeBelowPoc
             valueArea     += volumeAbovePoc
             levelAbovePoc += 1
         else
             valueArea     += volumeBelowPoc
             levelBelowPoc -= 1
-
     for level = 0 to profileLevels - 1
         if volumeProfile
             startBoxIndex = profilePlacement == 'Right' ? bar_index - int(array.get(volumeStorageT, level) / array.max(volumeStorageT) * profileLength * profileWidth) : profilePlacement == 'Left' ? bar_index - profileLength : bar_index
             endBoxIndex   = profilePlacement == 'Right' ? bar_index  :  startBoxIndex + int( array.get(volumeStorageT, level) / array.max(volumeStorageT) * profileLength * profileWidth)
             f_drawOnlyBoxX(startBoxIndex, priceLowest + (level + 0.1) * priceStep, endBoxIndex, priceLowest + (level + 0.9) * priceStep, level >= levelBelowPoc and level <= levelAbovePoc ? totalVolumeColor : vaVolumeColor, 1, line.style_solid)
-
     if backgroundFill
         f_drawOnlyBoxX(bar_index - profileLength, priceHighest, bar_index - 1, priceLowest, backgroundColor, 1, line.style_dotted)
-
     if pointOfControl
         array.push(a_poc_lines, line.new(bar_index - profileLength, priceLowest + (array.indexof(volumeStorageT, array.max(volumeStorageT)) + 0.5) * priceStep, bar_index, priceLowest + (array.indexof(volumeStorageT, array.max(volumeStorageT)) + 0.5) * priceStep, color=pocColor, width = pocWidth))
-        
     vah = f_drawOnlyLineX(bar_index - profileLength, priceLowest + (levelAbovePoc + 1.00) * priceStep, bar_index-1, priceLowest + (levelAbovePoc + 1.00) * priceStep, xloc.bar_index, extend.none, valueAreaHigh ? vahColor : #00000000, line.style_solid, 2)
     val = f_drawOnlyLineX(bar_index - profileLength, priceLowest + (levelBelowPoc + 0.00) * priceStep, bar_index-1, priceLowest + (levelBelowPoc + 0.00) * priceStep, xloc.bar_index, extend.none, valueAreaLow  ? valColor : #00000000, line.style_solid, 2)
-
     if vaBackground
         linefill.new(vah, val, vaBackgroundColor)
-
     pPOC := priceLowest + (array.indexof(volumeStorageT, array.max(volumeStorageT)) + 0.5) * priceStep
     pvah := priceLowest + (levelAbovePoc + 1.00) * priceStep
     pval := priceLowest + (levelBelowPoc + 0.00) * priceStep
@@ -307,14 +238,11 @@ var pocLevel      = 0
 [_, _, tradedVolume1] = f_getHighLow(profileLength, true, 0)
 
 if nzVolume and profileLength > 0 and priceStep > 0 and show_dvp
-
     if array.size(a_profileD) > 0
         for i = 0 to array.size(a_profileD) - 1
             box.delete(array.shift(a_profileD))
-
     for barIndex = 0 to profileLength
         level = 0
-
         for priceLevel = priceLowest to priceHighest by priceStep
             candleSize = high[barIndex] - low[barIndex]
             if high[barIndex] >= priceLevel and low[barIndex] < priceLevel + priceStep
@@ -327,53 +255,41 @@ if nzVolume and profileLength > 0 and priceStep > 0 and show_dvp
                 else if low[barIndex] <= priceLevel
                     array.set(volumeStorageT, level, array.get(volumeStorageT, level) + nzVolume[barIndex] * ((high[barIndex] - priceLevel) / candleSize))
             level += 1
-
     pocLevel          := array.indexof(volumeStorageT, array.max(volumeStorageT))
     totalVolumeTraded = array.sum(volumeStorageT) * isValueArea
     valueArea         = array.get(volumeStorageT, pocLevel)
     levelAbovePoc    := pocLevel
     levelBelowPoc    := pocLevel
-    
     while valueArea < totalVolumeTraded and totalVolumeTraded > 0
         if levelBelowPoc == 0 and levelAbovePoc == profileLevels - 1
             break
-
         volumeAbovePoc = 0.
         if levelAbovePoc < profileLevels - 1 
             volumeAbovePoc := array.get(volumeStorageT, levelAbovePoc + 1)
-
         volumeBelowPoc = 0.
         if levelBelowPoc > 0
             volumeBelowPoc := array.get(volumeStorageT, levelBelowPoc - 1)
-            
         if volumeBelowPoc == 0 and volumeAbovePoc == 0
             break
-        
         if volumeAbovePoc >= volumeBelowPoc
             valueArea     += volumeAbovePoc
             levelAbovePoc += 1
         else
             valueArea     += volumeBelowPoc
             levelBelowPoc -= 1
-        
         if levelAbovePoc - levelBelowPoc >= profileLevels
             break
-
     for level = 0 to profileLevels - 1
         if volumeProfile
             startBoxIndex = profilePlacement == 'Right' ? bar_index - int(array.get(volumeStorageT, level) / array.max(volumeStorageT) * profileLength * profileWidth)  : profilePlacement == 'Left' ? bar_index - profileLength : bar_index
             endBoxIndex   = profilePlacement == 'Right' ? bar_index  :  startBoxIndex + int( array.get(volumeStorageT, level) / array.max(volumeStorageT) * profileLength * profileWidth)
             array.push(a_profileD, box.new(startBoxIndex, priceLowest + (level + 0.1) * priceStep, endBoxIndex, priceLowest + (level + 0.9) * priceStep, level >= levelBelowPoc and level <= levelAbovePoc ? totalVolumeColor : vaVolumeColor, bgcolor = level >= levelBelowPoc and level <= levelAbovePoc ? totalVolumeColor : vaVolumeColor ))
-
     if backgroundFill
         array.push(a_profileD, box.new(bar_index - profileLength, priceHighest, bar_index, priceLowest, backgroundColor, bgcolor = backgroundColor ))
-
     if pointOfControl and not show_dpoc
         array.push(a_profileD, box.new(bar_index - profileLength, priceLowest + (pocLevel + .40) * priceStep, bar_index, priceLowest + (pocLevel + .60) * priceStep, pocColor, bgcolor = pocColor ))
-
     vah = f_drawLineX(bar_index - profileLength, priceLowest + (levelAbovePoc + 1.00) * priceStep, bar_index, priceLowest + (levelAbovePoc + 1.00) * priceStep, xloc.bar_index, extend.none, valueAreaHigh ? vahColor : #00000000, line.style_solid, 2)
     val = f_drawLineX(bar_index - profileLength, priceLowest + (levelBelowPoc + 0.00) * priceStep, bar_index, priceLowest + (levelBelowPoc + 0.00) * priceStep, xloc.bar_index, extend.none, valueAreaLow  ? valColor : #00000000, line.style_solid, 2)
-
     if vaBackground
         linefill.new(vah, val, vaBackgroundColor)
         
@@ -426,10 +342,10 @@ plot(show_dvah and show_dvp? DVAH : na, 'DVAH Path', proceed ? na : dvah_col, 2)
 plot(show_dval and show_dvp? DVAL : na, 'DPOC Path', proceed ? na : dval_col, 2)
 
 // Cross / Touch Plots ----------------------------------------------------------------------------
-plotshape(show_cross and poc_alert == 1 and close > open ? close : na, location = location.abovebar, style = shape.xcross, color= color.white, size = size.small)
-plotshape(show_cross and poc_alert == 1 and close < open ? close : na, location = location.belowbar, style = shape.xcross, color= color.white, size = size.small)
+plotshape(show_cross and poc_alert == 1 and close > open ? close : na, location = location.abovebar, style = shape.xcross,       color= color.green, size = size.small)
+plotshape(show_cross and poc_alert == 1 and close < open ? close : na, location = location.belowbar, style = shape.xcross,       color= color.green, size = size.small)
 plotshape(show_touch and poc_alert == 2 and close > open ? close : na, location = location.abovebar, style = shape.triangledown, color=color.yellow, size = size.small)
-plotshape(show_touch and poc_alert == 2 and close < open ? close : na, location = location.belowbar, style = shape.triangleup, color=color.yellow, size = size.small)
+plotshape(show_touch and poc_alert == 2 and close < open ? close : na, location = location.belowbar, style = shape.triangleup,   color=color.yellow, size = size.small)
 
 // Alerts --------------------------------------------------------------------------------------- 
 alertcondition(poc_alert == 1, "nPOC Crossed", "Naked POC Crossed")
