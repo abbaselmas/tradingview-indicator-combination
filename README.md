@@ -2,8 +2,282 @@
 
 ![Example Screenshot](https://github.com/abbaselmas/tradingview-indicator-combination/assets/28142617/e5908ea5-1aa1-417f-b44c-4a85ac541030)
 
-# Abbas1
-Range | Blocks | NYOpens | Weekendicator | CME | BPR
+# TradingView Indicator Suite
 
-# Abbas3
-PVP | nPOCs | Key Levels
+A professional collection of optimized Pine Script v6 indicators for comprehensive market analysis. This suite combines multiple powerful trading tools designed for serious traders who need precise levels, market structure, and volume analysis.
+
+---
+
+## 📊 Abbas1 - Multi-Indicator Trading System
+
+**Range | Blocks | NYOpens | Weekendicator | CME | BPR**
+
+### Overview
+A comprehensive all-in-one indicator that combines 6 powerful trading tools for enhanced market analysis. Perfect for traders who want key levels, market structure, and price ranges in a single clean indicator.
+
+### Features
+
+#### 1. 📈 Bollinger Bands
+- Customizable BB settings (length: 21, multiplier: 2.8)
+- Adjustable source and deviation calculations
+- Visual basis line with upper and lower bands
+- Identifies volatility and potential reversal zones
+
+#### 2. 📅 Weekendicator
+- Weekend price projection tool with automatic detection
+- Extends price levels during Saturday/Sunday
+- Adjustable multiplier (0-10%) for projection range
+- Anticipates Monday opening gaps using high/low ratios
+
+#### 3. 📦 Range Blocks (Market Structure)
+Advanced order flow visualization featuring:
+- **Order Blocks**: Untested and tested supply/demand zones with color coding
+- **Breaker Blocks**: Failed order blocks that indicate reversals
+- **MSB Lines**: Market Structure Break lines for trend changes
+- **Range Detection**: Identifies consolidation ranges with 0.25, 0.5, 0.75 levels
+- Real-time pivot high/low tracking
+- Automatic cleanup of invalidated blocks
+
+#### 4. 🗽 New York Opens
+Two critical NY session markers:
+- **Midnight Open (00:00 EST)**: CME futures opening price
+- **8:30 AM Open**: NYSE pre-market opening price
+- Customizable line styles (Solid, Dotted, Dashed)
+- Optional labels and historical lines
+- Individual color settings and session configuration
+
+#### 5. 🎯 Balanced Price Range (BPR)
+- Fair Value Gap (FVG) analysis for balanced price ranges
+- Detects both bullish and bearish BPR zones
+- "Clean" BPR filter (price doesn't interfere before completion)
+- Adjustable threshold for minimum range size
+- Configurable lookback period (default: 50 bars)
+- Real-time extension tracking
+
+#### 6. 📈 CME Gap Show & Fill
+CME Bitcoin Futures gap detection with 3 modes:
+1. Close from current symbol with CME trading hours
+2. Direct CME original close price
+3. CME settlement price
+- Tracks Friday close and monitors gap fill status
+- Visual background fill (green = filled up, red = filled down)
+- Automatic weekend gap detection
+- Proper time zone handling (GMT-5)
+
+### Settings & Customization
+
+**Input Groups:**
+- **BB**: Length, Source, Multiplier
+- **Weekend**: Multiplier percentage
+- **Range Blocks**: Toggle switches for MSB lines, Order Blocks, Breaker Blocks, Range lines, color customization
+- **New York Opens**: Separate settings for Midnight and 8:30 opens, display toggles, line styles
+- **Balanced Price Range**: Threshold, lookback period, clean BPR filter, delete old BPR option
+- **CME Gap**: Mode selection, automatic gap tracking
+
+### Performance
+- **Pine Script v6** with modern optimized syntax
+- Cached calculations to reduce redundant computations
+- Optimized array operations with size caching
+- Early loop exits for improved efficiency
+- Clean, organized code with section headers
+
+### Usage Tips
+- **Day Traders**: Focus on NY Opens and BPR for intraday setups
+- **Swing Traders**: Use Range Blocks and Bollinger Bands for structure
+- **Weekend Planning**: Monitor Weekendicator and CME gaps
+- **Order Flow**: Combine Order Blocks with BPR zones for high-probability entries
+- Best used on 15m-1H timeframes for cleaner signals
+
+### Technical Specifications
+- **Version**: Pine Script v6
+- **Overlay**: True
+- **Precision**: 4 decimal places
+- **Max Bars Back**: 1000
+- **Max Lines**: 500
+
+---
+
+## 📊 Abbas3 - Volume Profile & Key Levels System
+
+**PVP | nPOCs | Key Levels | Fair Value Gaps | Smart Money Concepts**
+
+### Overview
+An advanced indicator combining Periodic Volume Profile (PVP), multi-timeframe key levels, Fair Value Gaps (FVG), and Smart Money Concepts (SMC) for institutional-grade market analysis. Perfect for traders who need precise volume-based levels and market structure.
+
+### Features
+
+#### 1. 📊 Periodic Volume Profile (PVP)
+- **Multiple timeframe periods**: Intraday, Daily, Weekly, Monthly, 3M, 6M, Yearly
+- **Dynamic volume analysis** with customizable profile levels (default: 24)
+- **Point of Control (POC)**: Highest volume price level
+- **Value Area High (VAH)** and **Value Area Low (VAL)**: 70% of volume concentration
+- **Profile placement options**: Left, Right, or Center of period
+- **Visual customization**: Profile width, colors for total volume and value area
+- **Background fill** option for enhanced visibility
+- **Real-time profile updates** as new bars form
+
+#### 2. 🎯 Key Levels - Multi-Timeframe
+Comprehensive level tracking across all major timeframes:
+
+**4-Hour Levels:**
+- Previous 4H High, Low, Open, and Mid
+
+**Monday Range:**
+- Monday High, Low, and Mid (special session focus)
+
+**Daily Levels:**
+- Previous Day High (PDH), Previous Day Low (PDL)
+- Daily Open (DO), Previous Day Mid (PDM)
+
+**Weekly Levels:**
+- Previous Week High (PWH), Previous Week Low (PWL)
+- Weekly Open (WO), Previous Week Mid (PWM)
+
+**Monthly Levels:**
+- Previous Month High (PMH), Previous Month Low (PML)
+- Monthly Open (MO), Previous Month Mid (PMM)
+
+**Yearly Levels:**
+- Current Year High (CYH), Current Year Low (CYL)
+- Yearly Open (YO), Current Year Mid (CYM)
+
+**Key Level Features:**
+- Individual toggle switches for each timeframe
+- Customizable line styles (Solid, Dashed, Dotted)
+- Adjustable line width (Small, Medium, Large)
+- Text labels with two format options (Compact: "PDH" or Full: "Prev Day High")
+- Global color override option for unified appearance
+- Right-anchored or time-based placement
+- Automatic level merging when prices overlap
+- Display distance configuration (bars to extend right)
+
+#### 3. 📉 Fair Value Gaps (FVG)
+- **Bullish and Bearish FVG detection** using 3-candle patterns
+- **Auto Threshold**: Filters insignificant gaps automatically
+- **Custom timeframe support**: Analyze FVGs on any timeframe
+- **Box visualization**: FVGs drawn as boxes with transparency
+- **Auto-mitigation tracking**: Boxes delete when gap is filled
+- **Extend FVG**: Configure how many bars to extend boxes (default: 50)
+- Color-coded: Green for bullish, Red for bearish FVGs
+
+#### 4. 🧠 Smart Money Concepts (SMC)
+Advanced institutional trading concepts:
+
+**Market Structure:**
+- **Internal Structure**: Faster, more sensitive structure breaks
+- **Swing Structure**: Major trend structure breaks
+- **BOS (Break of Structure)**: Trend continuation signals
+- **CHoCH (Change of Character)**: Trend reversal signals
+- Separate controls for bullish and bearish structure
+- Confluence filter for internal structure (reduces false signals)
+
+**Swing Point Detection:**
+- Configurable swing length (default: 50)
+- High/Low pivot labels on chart
+- Strong/Weak High and Low identification
+- Real-time swing tracking
+
+**Trend Coloring:**
+- Color candles based on current trend
+- Two style options: Colored or Monochrome
+- Helps identify trend at a glance
+
+#### 5. ⚙️ Advanced Customization
+
+**Volume Profile Settings:**
+- Profile levels, period type, placement options
+- POC color and width, VAH/VAL colors
+- Value area percentage, background options
+- Daily volume profile toggle
+
+**Key Levels Settings:**
+- Individual timeframe enables/disables
+- Global vs individual coloring
+- Text label format and size options
+- Line style, width, and extension distance
+- Display style (Right Anchored or time-based)
+- Level merging option
+
+**Fair Value Gaps Settings:**
+- FVG display toggle
+- Auto threshold or manual filtering
+- Custom timeframe selection
+- Bullish/Bearish color customization
+- Extension bar configuration
+
+**Smart Money Concepts Settings:**
+- Mode: Historical or Present (clean chart option)
+- Style: Colored or Monochrome themes
+- Structure display toggles (Internal/Swing)
+- Bullish/Bearish structure filters (All, BOS only, CHoCH only)
+- Label size options (Tiny, Small, Normal)
+- Swing length and detection sensitivity
+
+### Performance Optimizations
+- **Pine Script v6** compliant with latest syntax
+- **Type declarations** for all variables and functions
+- **Cached calculations** to minimize redundant operations
+- **Optimized array operations** with pre-calculated sizes
+- **Early exit conditions** in loops and functions
+- **Efficient security requests** for multi-timeframe data
+- **Pre-calculated time-based values** for performance
+- **Section headers** for clean code organization
+
+### Usage Tips
+- **Volume Traders**: Use PVP to identify high-volume nodes and value areas for support/resistance
+- **Level Traders**: Key levels provide precise entry/exit points across all timeframes
+- **Smart Money Followers**: SMC features reveal institutional order flow and structure
+- **Gap Traders**: FVG boxes show unfilled gaps that price tends to revisit
+- **Multi-Timeframe Analysis**: Combine daily levels with weekly/monthly for confluence
+- Best used on 5m-1H for intraday, 4H-D for swing trading
+
+### Trading Applications
+1. **Support/Resistance**: Use POC, VAH, VAL, and key levels as S/R zones
+2. **Entry Setups**: Look for FVG + Key Level confluence for high-probability entries
+3. **Trend Confirmation**: SMC structure breaks confirm trend changes
+4. **Volume Nodes**: POC lines show where most trading occurred (strong S/R)
+5. **Gap Fills**: Trade FVG fills with confluence from key levels
+6. **Range Trading**: Use value area boundaries for range-bound strategies
+
+### Technical Specifications
+- **Version**: Pine Script v6
+- **Overlay**: True
+- **Precision**: 4 decimal places
+- **Max Bars Back**: 5000
+- **Max Lines**: 500
+- **Max Boxes**: 500
+- **Max Labels**: 500
+
+---
+
+## 🚀 Installation
+
+1. Open TradingView chart
+2. Click "Indicators" at the top
+3. Click "Pine Editor" at the bottom
+4. Copy the code from `Abbas1.pine` or `Abbas3.pine`
+5. Paste into the editor
+6. Click "Add to Chart"
+7. Configure settings to your preference
+
+## 📝 Notes
+
+- Both indicators are fully optimized for Pine Script v6
+- All calculations are cached for maximum performance
+- Code is well-organized with clear section headers
+- Fully customizable colors, sizes, and display options
+- Suitable for all markets: Crypto, Forex, Stocks, Commodities
+- Can be used together or separately depending on your trading style
+
+## ⚠️ Disclaimer
+
+These indicators are for educational purposes only. Always practice proper risk management and conduct your own analysis before trading. Past performance does not guarantee future results.
+
+## 👨‍💻 Author
+
+**Abbas Elmas**
+- Repository: [tradingview-indicator-combination](https://github.com/abbaselmas/tradingview-indicator-combination)
+
+## 📄 License
+
+Open source - Feel free to modify and use for personal trading.
