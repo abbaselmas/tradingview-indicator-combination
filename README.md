@@ -39,9 +39,9 @@ Advanced order flow visualization featuring:
 - Automatic cleanup of invalidated blocks
 
 #### 4. 🗽 New York Opens
-Two critical NY session markers:
-- **Midnight Open (00:00 EST)**: CME futures opening price
-- **8:30 AM Open**: NYSE pre-market opening price
+Two NY session markers, defined in New York local time (DST-aware on any symbol):
+- **Midnight Open (00:00 New York)**: the New York midnight opening price
+- **8:30 AM Open (08:30 New York)**: opening price at the US economic data release time
 - Customizable line styles (Solid, Dotted, Dashed)
 - Optional labels and historical lines
 - Individual color settings and session configuration
@@ -55,14 +55,14 @@ Two critical NY session markers:
 - Real-time extension tracking
 
 #### 6. 📈 CME Gap Show & Fill
-CME Bitcoin Futures gap detection with 3 modes:
+CME Bitcoin Futures (`CME:BTC1!`) weekend gap with 3 modes:
 1. Close from current symbol with CME trading hours
 2. Direct CME original close price
 3. CME settlement price
-- Tracks Friday close and monitors gap fill status
-- Visual background fill (green = filled up, red = filled down)
-- Automatic weekend gap detection
-- Proper time zone handling (GMT-5)
+- Draws the Friday close line while CME is closed (Friday 16:00 to Sunday 17:00 Chicago time)
+- Background fill: green when price is above the Friday close, red when below
+- Time zone handling in America/Chicago (DST-aware), works on any chart timeframe
+- Meant for BTC charts; modes 2 and 3 always read `CME:BTC1!`
 
 ### Settings & Customization
 
@@ -94,6 +94,7 @@ CME Bitcoin Futures gap detection with 3 modes:
 - **Precision**: 4 decimal places
 - **Max Bars Back**: 1000
 - **Max Lines**: 500
+- **Max Boxes**: 50 (TradingView default; oldest boxes are removed first)
 
 ---
 
@@ -107,19 +108,25 @@ An advanced indicator combining Periodic Volume Profile (PVP), multi-timeframe k
 ### Features
 
 #### 1. 📊 Periodic Volume Profile (PVP)
-- **Multiple timeframe periods**: Intraday, Daily, Weekly, Monthly, 3M, 6M, Yearly
-- **Dynamic volume analysis** with customizable profile levels (default: 24)
+- **Any periodic timeframe**: e.g. 4H, Daily, Weekly (default), 2W, Monthly, 3M, 6M, 12M
+- **Dynamic volume analysis** with customizable number of rows (default: 200, range 50-400)
 - **Point of Control (POC)**: Highest volume price level
-- **Value Area High (VAH)** and **Value Area Low (VAL)**: 70% of volume concentration
-- **Profile placement options**: Left, Right, or Center of period
+- **Value Area High (VAH)** and **Value Area Low (VAL)**: default 68% of period volume (adjustable)
+- **Profile placement options**: Left, Right, or Next Period
 - **Visual customization**: Profile width, colors for total volume and value area
 - **Background fill** option for enhanced visibility
-- **Real-time profile updates** as new bars form
+- **Developing profile** (optional) with DPOC/DVAH/DVAL path plots
+- **Previous period** POC/VAH/VAL lines (optional)
 
-#### 2. 🎯 Key Levels - Multi-Timeframe
+#### 2. 📍 Naked POCs (nPOCs)
+- Each completed period's POC extends right until price touches it, crosses it, or the last bar (configurable)
+- Optional cross (✕) and touch (▲/▼) markers on the chart
+- Alerts: "nPOC Crossed" and "nPOC Touched"
+
+#### 3. 🎯 Key Levels - Multi-Timeframe
 Comprehensive level tracking across all major timeframes:
 
-**4-Hour Levels:**
+**4-Hour Levels** (off by default):
 - Previous 4H High, Low, Open, and Mid
 
 **Monday Range:**
@@ -147,20 +154,20 @@ Comprehensive level tracking across all major timeframes:
 - Adjustable line width (Small, Medium, Large)
 - Text labels with two format options (Compact: "PDH" or Full: "Prev Day High")
 - Global color override option for unified appearance
-- Right-anchored or time-based placement
-- Automatic level merging when prices overlap
+- Display style: Standard (line starts at the level's origin) or Right Anchored
+- Automatic label merging when two levels have exactly the same price
 - Display distance configuration (bars to extend right)
 
-#### 3. 📉 Fair Value Gaps (FVG)
+#### 4. 📉 Fair Value Gaps (FVG)
 - **Bullish and Bearish FVG detection** using 3-candle patterns
 - **Auto Threshold**: Filters insignificant gaps automatically
 - **Custom timeframe support**: Analyze FVGs on any timeframe
 - **Box visualization**: FVGs drawn as boxes with transparency
-- **Auto-mitigation tracking**: Boxes delete when gap is filled
+- **Auto-mitigation tracking**: Boxes are removed once price fully fills the gap
 - **Extend FVG**: Configure how many bars to extend boxes (default: 50)
 - Color-coded: Green for bullish, Red for bearish FVGs
 
-#### 4. 🧠 Smart Money Concepts (SMC)
+#### 5. 🧠 Smart Money Concepts (SMC)
 Advanced institutional trading concepts:
 
 **Market Structure:**
@@ -182,20 +189,20 @@ Advanced institutional trading concepts:
 - Two style options: Colored or Monochrome
 - Helps identify trend at a glance
 
-#### 5. ⚙️ Advanced Customization
+#### 6. ⚙️ Advanced Customization
 
 **Volume Profile Settings:**
 - Profile levels, period type, placement options
 - POC color and width, VAH/VAL colors
 - Value area percentage, background options
-- Daily volume profile toggle
+- Developing profile, previous-period levels, and nPOC extension mode
 
 **Key Levels Settings:**
 - Individual timeframe enables/disables
 - Global vs individual coloring
 - Text label format and size options
 - Line style, width, and extension distance
-- Display style (Right Anchored or time-based)
+- Display style (Standard or Right Anchored)
 - Level merging option
 
 **Fair Value Gaps Settings:**
@@ -214,14 +221,11 @@ Advanced institutional trading concepts:
 - Swing length and detection sensitivity
 
 ### Performance Optimizations
-- **Pine Script v6** compliant with latest syntax
-- **Type declarations** for all variables and functions
-- **Cached calculations** to minimize redundant operations
-- **Optimized array operations** with pre-calculated sizes
-- **Early exit conditions** in loops and functions
-- **Efficient security requests** for multi-timeframe data
-- **Pre-calculated time-based values** for performance
-- **Section headers** for clean code organization
+- **Pine Script v6**
+- **Range-limited volume binning**: each bar only updates the profile rows it overlaps
+- **Developing profile** is drawn only on the last bar and computed per bar only when path plots are enabled
+- **Period detection** via `timeframe.change()` instead of extra security requests
+- **Mitigated FVGs** are pruned from memory, so per-bar work does not grow over time
 
 ### Usage Tips
 - **Volume Traders**: Use PVP to identify high-volume nodes and value areas for support/resistance
@@ -242,8 +246,7 @@ Advanced institutional trading concepts:
 ### Technical Specifications
 - **Version**: Pine Script v6
 - **Overlay**: True
-- **Precision**: 4 decimal places
-- **Max Bars Back**: 5000
+- **Max Bars Back**: 500 (5000 for the high/low/volume series used by the volume profile; profile length is capped at 4999 bars)
 - **Max Lines**: 500
 - **Max Boxes**: 500
 - **Max Labels**: 500
