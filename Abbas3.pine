@@ -36,6 +36,27 @@ f_getHighLow(_len, _calc, _offset) =>
                 htf_h := math.max(high[_offset + x], htf_h)
                 vol += volume[_offset + x]
         [htf_h, htf_l, vol]
+// Distribute one bar's volume over the profile rows it overlaps (visits only those rows, not all of them)
+f_addBarVolume(array<float> store, float barHigh, float barLow, float barVolume, float pLow, float pStep, int levels) =>
+    float candleSize = barHigh - barLow
+    int firstLevel = math.max(int(math.floor((barLow - pLow) / pStep)), 0)
+    int lastLevel = math.min(int(math.floor((barHigh - pLow) / pStep)), levels - 1)
+    if candleSize == 0
+        int flatLevel = math.min(firstLevel, levels - 1)
+        array.set(store, flatLevel, array.get(store, flatLevel) + barVolume)
+    else if lastLevel >= firstLevel
+        for level = firstLevel to lastLevel
+            float priceLevel = pLow + level * pStep
+            if barHigh >= priceLevel and barLow < priceLevel + pStep
+                if barHigh <= priceLevel + pStep and barLow >= priceLevel
+                    array.set(store, level, array.get(store, level) + barVolume)
+                else if barHigh >= priceLevel + pStep and barLow <= priceLevel
+                    array.set(store, level, array.get(store, level) + barVolume * (pStep / candleSize))
+                else if barHigh >= priceLevel + pStep
+                    array.set(store, level, array.get(store, level) + barVolume * ((priceLevel + pStep - barLow) / candleSize))
+                else if barLow <= priceLevel
+                    array.set(store, level, array.get(store, level) + barVolume * ((barHigh - priceLevel) / candleSize))
+    int(na)
 f_checkBreaches(arrayOfLines, extend) =>
     // Iterate backwards so removing a line does not skip the next one
     int qtyOfLines = array.size(arrayOfLines)
@@ -164,21 +185,8 @@ float priceStep = (priceHighest - priceLowest) / profileLevels
 
 // Optimize: Combine conditions and cache common checks
 if proceed and nzVolume > 0 and priceStep > 0 and bar_index > profileLength and profileLength > 0
-    for barIndexx = 1 to profileLength
-        int level = 0
-        int barIndex = barIndexx
-        for priceLevel = priceLowest to priceHighest by priceStep
-            float candleSize = high[barIndex] - low[barIndex]
-            if high[barIndex] >= priceLevel and low[barIndex] < priceLevel + priceStep
-                if high[barIndex] <= priceLevel + priceStep and low[barIndex] >= priceLevel
-                    array.set(volumeStorageT, level, array.get(volumeStorageT, level) + nzVolume[barIndex])
-                else if high[barIndex] >= priceLevel + priceStep and low[barIndex] <= priceLevel
-                    array.set(volumeStorageT, level, array.get(volumeStorageT, level) + nzVolume[barIndex] * (priceStep/ candleSize))
-                else if high[barIndex] >= priceLevel + priceStep
-                    array.set(volumeStorageT, level, array.get(volumeStorageT, level) + nzVolume[barIndex] * ((priceLevel + priceStep - low[barIndex]) / candleSize))
-                else if low[barIndex] <= priceLevel
-                    array.set(volumeStorageT, level, array.get(volumeStorageT, level) + nzVolume[barIndex] * ((high[barIndex] - priceLevel) / candleSize))
-            level += 1
+    for barIndex = 1 to profileLength
+        f_addBarVolume(volumeStorageT, high[barIndex], low[barIndex], nzVolume[barIndex], priceLowest, priceStep, profileLevels)
     pocLevel          = array.indexof(volumeStorageT, array.max(volumeStorageT))
     totalVolumeTraded = array.sum(volumeStorageT) * isValueArea
     valueArea         = array.get(volumeStorageT, pocLevel)
@@ -233,19 +241,7 @@ bool dvp_paths = show_dpoc or show_dvah or show_dval
 var linefill dvp_va_fill = na
 if nzVolume > 0 and profileLength > 0 and priceStep > 0 and show_dvp and (barstate.islast or dvp_paths)
     for barIndex = 0 to profileLength
-        level = 0
-        for priceLevel = priceLowest to priceHighest by priceStep
-            candleSize = high[barIndex] - low[barIndex]
-            if high[barIndex] >= priceLevel and low[barIndex] < priceLevel + priceStep
-                if high[barIndex] <= priceLevel + priceStep and low[barIndex] >= priceLevel
-                    array.set(volumeStorageT, level, array.get(volumeStorageT, level) + nzVolume[barIndex])
-                else if high[barIndex] >= priceLevel + priceStep and low[barIndex] <= priceLevel
-                    array.set(volumeStorageT, level, array.get(volumeStorageT, level) + nzVolume[barIndex] * (priceStep/ candleSize))
-                else if high[barIndex] >= priceLevel + priceStep
-                    array.set(volumeStorageT, level, array.get(volumeStorageT, level) + nzVolume[barIndex] * ((priceLevel + priceStep - low[barIndex]) / candleSize))
-                else if low[barIndex] <= priceLevel
-                    array.set(volumeStorageT, level, array.get(volumeStorageT, level) + nzVolume[barIndex] * ((high[barIndex] - priceLevel) / candleSize))
-            level += 1
+        f_addBarVolume(volumeStorageT, high[barIndex], low[barIndex], nzVolume[barIndex], priceLowest, priceStep, profileLevels)
     pocLevel          := array.indexof(volumeStorageT, array.max(volumeStorageT))
     totalVolumeTraded = array.sum(volumeStorageT) * isValueArea
     valueArea         = array.get(volumeStorageT, pocLevel)
