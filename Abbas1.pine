@@ -299,7 +299,7 @@ if barstate.isconfirmed
 // ════════════════════════════════════════════════════════════════════════════
 // Midnight Open Settings
 iMDisplay = input.bool(true, "Display", group="New York Midnight Open")
-iMTime = input.session('0400-0405:1234567', "Session", group="New York Midnight Open")
+iMTime = input.session('0000-0005:1234567', "Session (New York time)", group="New York Midnight Open")
 iMStyle = input.string("Dashed", "Line Style", options=["Solid", "Dotted", "Dashed"], group="New York Midnight Open")
 iMColor = input.color(#58A2B0, "Color", group="New York Midnight Open")
 iMHistory = input.bool(false, "History", group="New York Midnight Open")
@@ -307,15 +307,15 @@ iMLabel = input.bool(true, "Show Label", group="New York Midnight Open")
 
 // 8:30 Open Settings
 i8Display = input.bool(true, "Display", group="New York 8:30 Open")
-i8Time = input.session('1230-1235:1234567', "Session", group="New York 8:30 Open")
+i8Time = input.session('0830-0835:1234567', "Session (New York time)", group="New York 8:30 Open")
 i8Style = input.string("Dotted", "Line Style", options=["Solid", "Dotted", "Dashed"], group="New York 8:30 Open")
 i8Color = input.color(#58A2B0, "Color", group="New York 8:30 Open")
 i8History = input.bool(false, "History", group="New York 8:30 Open")
 i8Label = input.bool(true, "Show Label", group="New York 8:30 Open")
 
-// Time checks
-tMidnight = time("1", iMTime)
-t830 = time("1", i8Time)
+// Time checks (sessions are New York local time, so DST is handled for any symbol)
+tMidnight = time("1", iMTime, "America/New_York")
+t830 = time("1", i8Time, "America/New_York")
 
 // Optimize: Simplify style conversion
 _MStyle = iMStyle == "Solid" ? line.style_solid : iMStyle == "Dotted" ? line.style_dotted : line.style_dashed
