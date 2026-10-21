@@ -1335,15 +1335,29 @@ if show_fvg
           , border_color = bear_fvg_css
           , bgcolor = bear_fvg_css))
 
-    for bx in bullish_fvg_min
-        if low < box.get_bottom(bx)
-            box.delete(bx)
-            box.delete(array.get(bullish_fvg_max, array.indexof(bullish_fvg_min, bx)))
-    
-    for bx in bearish_fvg_max
-        if high > box.get_top(bx)
-            box.delete(bx)
-            box.delete(array.get(bearish_fvg_min, array.indexof(bearish_fvg_max, bx)))
+    // Remove mitigated (or auto-deleted) FVGs from the arrays too, so they don't grow forever.
+    // Iterate backwards; max/min arrays are always pushed in pairs, so indices match.
+    int bull_fvg_count = array.size(bullish_fvg_min)
+    if bull_fvg_count > 0
+        for i = bull_fvg_count - 1 to 0
+            box bx = array.get(bullish_fvg_min, i)
+            float bx_bottom = box.get_bottom(bx)
+            if na(bx_bottom) or low < bx_bottom
+                box.delete(bx)
+                box.delete(array.get(bullish_fvg_max, i))
+                array.remove(bullish_fvg_min, i)
+                array.remove(bullish_fvg_max, i)
+
+    int bear_fvg_count = array.size(bearish_fvg_max)
+    if bear_fvg_count > 0
+        for i = bear_fvg_count - 1 to 0
+            box bx = array.get(bearish_fvg_max, i)
+            float bx_top = box.get_top(bx)
+            if na(bx_top) or high > bx_top
+                box.delete(bx)
+                box.delete(array.get(bearish_fvg_min, i))
+                array.remove(bearish_fvg_max, i)
+                array.remove(bearish_fvg_min, i)
 
 // ════════════════════════════════════════════════════════════════════════════
 // TREND COLORING
