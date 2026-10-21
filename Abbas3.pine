@@ -227,12 +227,11 @@ priceLowest      := ta.lowest (low , profileLength > 0 ? profileLength + 1 : 1)
 priceStep        := (priceHighest - priceLowest) / profileLevels
 var pocLevel      = 0
 
-
-// Optimize: Check if nzVolume is greater than 0 (explicit boolean)
-if nzVolume > 0 and profileLength > 0 and priceStep > 0 and show_dvp
-    if array.size(a_profileD) > 0
-        for i = 0 to array.size(a_profileD) - 1
-            box.delete(array.shift(a_profileD))
+// Developing profile: per-bar computation is only needed for the path plots;
+// drawing happens only on the last bar (it used to rebuild up to 200 boxes on every historical bar).
+bool dvp_paths = show_dpoc or show_dvah or show_dval
+var linefill dvp_va_fill = na
+if nzVolume > 0 and profileLength > 0 and priceStep > 0 and show_dvp and (barstate.islast or dvp_paths)
     for barIndex = 0 to profileLength
         level = 0
         for priceLevel = priceLowest to priceHighest by priceStep
@@ -271,20 +270,24 @@ if nzVolume > 0 and profileLength > 0 and priceStep > 0 and show_dvp
             levelBelowPoc -= 1
         if levelAbovePoc - levelBelowPoc >= profileLevels
             break
-    for level = 0 to profileLevels - 1
-        if volumeProfile
-            startBoxIndex = profilePlacement == 'Right' ? bar_index - int(array.get(volumeStorageT, level) / array.max(volumeStorageT) * profileLength * profileWidth)  : profilePlacement == 'Left' ? bar_index - profileLength : bar_index
-            endBoxIndex   = profilePlacement == 'Right' ? bar_index  :  startBoxIndex + int( array.get(volumeStorageT, level) / array.max(volumeStorageT) * profileLength * profileWidth)
-            array.push(a_profileD, box.new(startBoxIndex, priceLowest + (level + 0.1) * priceStep, endBoxIndex, priceLowest + (level + 0.9) * priceStep, level >= levelBelowPoc and level <= levelAbovePoc ? totalVolumeColor : vaVolumeColor, bgcolor = level >= levelBelowPoc and level <= levelAbovePoc ? totalVolumeColor : vaVolumeColor ))
-    if backgroundFill
-        array.push(a_profileD, box.new(bar_index - profileLength, priceHighest, bar_index, priceLowest, backgroundColor, bgcolor = backgroundColor ))
-    if pointOfControl and not show_dpoc
-        array.push(a_profileD, box.new(bar_index - profileLength, priceLowest + (pocLevel + .40) * priceStep, bar_index, priceLowest + (pocLevel + .60) * priceStep, pocColor, bgcolor = pocColor ))
-    vah = f_drawLineX(bar_index - profileLength, priceLowest + (levelAbovePoc + 1.00) * priceStep, bar_index, priceLowest + (levelAbovePoc + 1.00) * priceStep, xloc.bar_index, extend.none, valueAreaHigh ? vahColor : #00000000, line.style_solid, 2)
-    val = f_drawLineX(bar_index - profileLength, priceLowest + (levelBelowPoc + 0.00) * priceStep, bar_index, priceLowest + (levelBelowPoc + 0.00) * priceStep, xloc.bar_index, extend.none, valueAreaLow  ? valColor : #00000000, line.style_solid, 2)
-    if vaBackground
-        linefill.new(vah, val, vaBackgroundColor)
-        
+    if barstate.islast
+        if array.size(a_profileD) > 0
+            for i = 0 to array.size(a_profileD) - 1
+                box.delete(array.shift(a_profileD))
+        for level = 0 to profileLevels - 1
+            if volumeProfile
+                startBoxIndex = profilePlacement == 'Right' ? bar_index - int(array.get(volumeStorageT, level) / array.max(volumeStorageT) * profileLength * profileWidth)  : profilePlacement == 'Left' ? bar_index - profileLength : bar_index
+                endBoxIndex   = profilePlacement == 'Right' ? bar_index  :  startBoxIndex + int( array.get(volumeStorageT, level) / array.max(volumeStorageT) * profileLength * profileWidth)
+                array.push(a_profileD, box.new(startBoxIndex, priceLowest + (level + 0.1) * priceStep, endBoxIndex, priceLowest + (level + 0.9) * priceStep, level >= levelBelowPoc and level <= levelAbovePoc ? totalVolumeColor : vaVolumeColor, bgcolor = level >= levelBelowPoc and level <= levelAbovePoc ? totalVolumeColor : vaVolumeColor ))
+        if backgroundFill
+            array.push(a_profileD, box.new(bar_index - profileLength, priceHighest, bar_index, priceLowest, backgroundColor, bgcolor = backgroundColor ))
+        if pointOfControl and not show_dpoc
+            array.push(a_profileD, box.new(bar_index - profileLength, priceLowest + (pocLevel + .40) * priceStep, bar_index, priceLowest + (pocLevel + .60) * priceStep, pocColor, bgcolor = pocColor ))
+        vah = f_drawLineX(bar_index - profileLength, priceLowest + (levelAbovePoc + 1.00) * priceStep, bar_index, priceLowest + (levelAbovePoc + 1.00) * priceStep, xloc.bar_index, extend.none, valueAreaHigh ? vahColor : #00000000, line.style_solid, 2)
+        val = f_drawLineX(bar_index - profileLength, priceLowest + (levelBelowPoc + 0.00) * priceStep, bar_index, priceLowest + (levelBelowPoc + 0.00) * priceStep, xloc.bar_index, extend.none, valueAreaLow  ? valColor : #00000000, line.style_solid, 2)
+        if vaBackground and na(dvp_va_fill)
+            dvp_va_fill := linefill.new(vah, val, vaBackgroundColor)
+
 DPoC = priceLowest + (array.indexof(volumeStorageT, array.max(volumeStorageT)) + .50) * priceStep
 DVAH = priceLowest + (levelAbovePoc + 1.00) * priceStep
 DVAL = priceLowest + (levelBelowPoc + 0.00) * priceStep
