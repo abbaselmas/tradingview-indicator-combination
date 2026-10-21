@@ -126,6 +126,13 @@ dval_col          = input.color(color.aqua, '', group = group_volume_profile, in
 // ════════════════════════════════════════════════════════════════════════════
 // Optimize: Cache volume to avoid repeated nz() calls
 float nzVolume = nz(volume)
+// Profile loops look back a whole period (e.g. W on 15m = 672 bars), beyond the global 500-bar buffer.
+// Only these series get a deep buffer, and profile length is clamped to it to avoid runtime errors.
+int MAX_PROFILE_BARS = 4999
+max_bars_back(high, 5000)
+max_bars_back(low, 5000)
+max_bars_back(volume, 5000)
+max_bars_back(nzVolume, 5000)
 array<float> volumeStorageT = array.new_float(profileLevels + 1, 0.)
 var array<line> a_poc_lines = array.new_line()
 var int x1 = 0
@@ -144,7 +151,7 @@ bool bar_start = timeframe.change(periodic_tf)
 var int period_start_bar = 0
 int profileLength = 0
 if bar_start
-    profileLength := bar_index - period_start_bar  // bars in the period that just ended
+    profileLength := math.min(bar_index - period_start_bar, MAX_PROFILE_BARS)  // bars in the period that just ended
     period_start_bar := bar_index
 bool proceed = bar_start
 
@@ -214,7 +221,7 @@ if proceed and nzVolume > 0 and priceStep > 0 and bar_index > profileLength and 
 current_start = ta.barssince(bar_start)
 
 var a_profileD    = array.new_box()
-profileLength    := current_start
+profileLength    := math.min(current_start, MAX_PROFILE_BARS)
 priceHighest     := ta.highest(high, profileLength > 0 ? profileLength + 1 : 1)
 priceLowest      := ta.lowest (low , profileLength > 0 ? profileLength + 1 : 1)
 priceStep        := (priceHighest - priceLowest) / profileLevels
