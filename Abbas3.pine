@@ -53,26 +53,20 @@ f_getHighLow(_len, _calc, _offset) =>
                 vol += volume[_offset + x]
         [htf_h, htf_l, vol]
 f_checkBreaches(arrayOfLines, extend) =>
-    // Optimize: Cache array size and pre-calculate signs
+    // Iterate backwards so removing a line does not skip the next one
     int qtyOfLines = array.size(arrayOfLines)
     if qtyOfLines > 0
-        float close_prev_sign = math.sign(close[1])
-        float close_sign = math.sign(close)
-        float low_sign = math.sign(low)
-        float high_sign = math.sign(high)
-        
-        for lineNo = 0 to qtyOfLines - 1
-            if lineNo < array.size(arrayOfLines)
-                line currentLine = array.get(arrayOfLines, lineNo)
-                float lineLevel = line.get_y1(currentLine)
-                bool lineWasCrossed = math.sign(close[1] - lineLevel) != math.sign(close - lineLevel)
-                bool lineWasTouched = math.sign(close[1] - lineLevel) != math.sign(low - lineLevel) or math.sign(close[1] - lineLevel) != math.sign(high - lineLevel) 
-                if lineWasCrossed and extend == 'Until Bar Cross'
-                    array.remove(arrayOfLines, lineNo)
-                else if lineWasTouched and extend == 'Until Bar Touch'
-                    array.remove(arrayOfLines, lineNo)
-                else
-                    line.set_x2(currentLine, bar_index)
+        for lineNo = qtyOfLines - 1 to 0
+            line currentLine = array.get(arrayOfLines, lineNo)
+            float lineLevel = line.get_y1(currentLine)
+            bool lineWasCrossed = math.sign(close[1] - lineLevel) != math.sign(close - lineLevel)
+            bool lineWasTouched = math.sign(close[1] - lineLevel) != math.sign(low - lineLevel) or math.sign(close[1] - lineLevel) != math.sign(high - lineLevel)
+            if lineWasCrossed and extend == 'Until Bar Cross'
+                array.remove(arrayOfLines, lineNo)
+            else if lineWasTouched and extend == 'Until Bar Touch'
+                array.remove(arrayOfLines, lineNo)
+            else
+                line.set_x2(currentLine, bar_index)
     int(na)
 f_checkBreaches_alert(arrayOfLines, extend) =>
     // Optimize: Early exit and cached calculations
