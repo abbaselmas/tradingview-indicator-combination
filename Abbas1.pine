@@ -370,7 +370,7 @@ bpr_threshold = input.float(0, step=0.25, title="BPR Threshold", tooltip="Valid 
 bars_since = input(50, "Bars to Look Back for BPR", tooltip="Only look for BPR's when a sequence of bearish and bullish FVG's are within this many bars of each other", group="Balanced Price Range")
 only_clean_bpr = input(false, "Only Clean BPR", tooltip="Only show BPR's when price does not interfere with the range prior to its completion", group="Balanced Price Range")
 delete_old_bpr = input(true, "Delete Old BPR", tooltip="Delete all BPR's that have been invalidated or overwritten. Only show current/active BPR's", group="Balanced Price Range")
-bearish_bpr_color = input.color(color.new(color.green, 70), "Bearish BPR Color", group="Balanced Price Range")
+bearish_bpr_color = input.color(color.new(color.red, 70), "Bearish BPR Color", group="Balanced Price Range")
 bullish_bpr_color = input.color(color.new(color.green, 70), "Bullish BPR Color", group="Balanced Price Range")
 
 // BPR Variables
