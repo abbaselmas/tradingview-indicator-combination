@@ -478,16 +478,18 @@ getCloseCME() =>
     var float cmeClose = 0.0
     var int showLine = 0
     
-    // Optimize: Pre-calculate timestamp
-    bool is_friday_close = dayofweek == 6 and time == timestamp('GMT-5', year, month, dayofmonth, 16, 0, 0)
-    bool is_weekend_start = time >= timestamp('GMT-5', year, month, dayofmonth, 16, 0, 0) and dayofweek >= 6
-    bool is_monday_open = dayofweek <= 1 and time >= timestamp('GMT-5', year, month, dayofmonth, 17, 0, 0)
-    
+    // CME is closed from Friday 16:00 to Sunday 17:00 Chicago time (DST-aware).
+    // The first bar inside that window marks the close, so it works on any timeframe.
+    int ct_dow = dayofweek(time, "America/Chicago")
+    int ct_hour = hour(time, "America/Chicago")
+    bool cme_closed = (ct_dow == dayofweek.friday and ct_hour >= 16) or ct_dow == dayofweek.saturday or (ct_dow == dayofweek.sunday and ct_hour < 17)
+    bool is_friday_close = cme_closed and not cme_closed[1]
+
     if is_friday_close
         cmeClose := mode == "1 - Close from current symbol" ? close[1] : mode == "2 - CME original close price" ? cme : cmeSettlement
-    
-    showLine := showLine == 0 and is_weekend_start ? 1 : showLine == 1 and is_monday_open ? 0 : showLine
-    
+
+    showLine := cme_closed ? 1 : 0
+
     [cmeClose, showLine]
 
 [cmeClose, showLine] = getCloseCME()
