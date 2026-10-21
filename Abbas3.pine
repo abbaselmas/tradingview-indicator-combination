@@ -8,22 +8,6 @@ tickerTxt = syminfo.ticker
 // ════════════════════════════════════════════════════════════════════════════
 // HELPER FUNCTIONS
 // ════════════════════════════════════════════════════════════════════════════
-f_resInMinutes() =>
-    // Optimize: Simplified calculation with pre-calculated multipliers
-    float _resInMinutes = timeframe.multiplier * (
-      timeframe.isseconds ? 1. / 60 : 
-      timeframe.isminutes ? 1. : 
-      timeframe.isdaily ? 1440. : 
-      timeframe.isweekly ? 10080. : 
-      timeframe.ismonthly ? 43830. : na)
-    _resInMinutes
-f_tfResInMinutes(_res) =>
-    request.security(syminfo.tickerid, _res, f_resInMinutes())
-f_tfIsIntraday(_res) =>
-    [intraday, daily, weekly, monthly] = request.security(syminfo.tickerid, _res, [timeframe.isintraday, timeframe.isdaily, timeframe.isweekly, timeframe.ismonthly])
-    // Optimize: Simplified ternary
-    string check = intraday ? "Intraday" : daily ? "Daily" : weekly ? "Weekly" : monthly ? "Monthly" : "Error" 
-    check
 f_drawOnlyLineX(_x1, _y1, _x2, _y2, _xloc, _extend, _color, _style, _width) =>
     id = line.new(_x1, _y1, _x2, _y2, _xloc, _extend, _color, _style, _width)
 f_drawLineX(_x1, _y1, _x2, _y2, _xloc, _extend, _color, _style, _width) =>
@@ -155,35 +139,13 @@ var float pval = 0.
 // ════════════════════════════════════════════════════════════════════════════
 // VOLUME PROFILE CALCULATIONS
 // ════════════════════════════════════════════════════════════════════════════
-// Optimize: Pre-calculate time-based values
-int min_of_day = hour * 60 + minute
-int intv = 0
-int C_bar = 0
-bool bar_start = false
-string period = f_tfIsIntraday(periodic_tf)
-// Optimize: ta.barssince requires bool condition, not int - check if time changed
-int daily_start = ta.barssince(ta.change(time("D")) != 0)
-int weekly_start = ta.barssince(ta.change(time("W")) != 0)
-int monthly_start = ta.barssince(ta.change(time("M")) != 0)
-int threeM_start = ta.barssince(ta.change(time("3M")) != 0)
-int sixM_start = ta.barssince(ta.change(time("6M")) != 0)
-int yearly_start = ta.barssince(ta.change(time("12M")) != 0)
+// A new period starts whenever the periodic timeframe bar changes (works for any TF: 4H, D, 2W, 3M, 12M, ...)
+bool bar_start = timeframe.change(periodic_tf)
+var int period_start_bar = 0
 int profileLength = 0
-if period == "Intraday"
-    intv := int(f_tfResInMinutes(periodic_tf))
-    C_bar := (min_of_day % intv)
-    profileLength := ta.barssince(C_bar[1] == 0) +1
-else if period == "Daily"
-    C_bar := daily_start
-    profileLength := daily_start[1]+1
-else if period == "Weekly"
-    C_bar := weekly_start
-    profileLength := weekly_start[1]+1
-else if period == "Monthly"
-    C_bar := monthly_start
-    profileLength := C_bar[1]+1
-
-bar_start := C_bar == 0
+if bar_start
+    profileLength := bar_index - period_start_bar  // bars in the period that just ended
+    period_start_bar := bar_index
 bool proceed = bar_start
 
 if proceed
