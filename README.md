@@ -6,6 +6,8 @@
 
 A professional collection of optimized Pine Script v6 indicators for comprehensive market analysis. This suite combines multiple powerful trading tools designed for serious traders who need precise levels, market structure, and volume analysis.
 
+**Why two indicators?** TradingView's free (Basic) plan allows only two indicators on a chart at the same time. Abbas1 and Abbas3 each bundle several public tools into one script so that both fit within that limit.
+
 ---
 
 ## 📊 Abbas1 - Multi-Indicator Trading System
@@ -263,13 +265,16 @@ Advanced institutional trading concepts:
 6. Click "Add to Chart"
 7. Configure settings to your preference
 
+### Upgrading from an earlier version
+- **Abbas1 New York Opens**: the session inputs are now in New York local time (defaults `0000-0005` and `0830-0835`). If you added Abbas1 to a chart before this change, the chart keeps the old values (`0400-0405`, `1230-1235`). Reset both session inputs to their defaults (or re-add the indicator).
+
 ## 📝 Notes
 
-- Both indicators are fully optimized for Pine Script v6
-- All calculations are cached for maximum performance
-- Code is well-organized with clear section headers
-- Fully customizable colors, sizes, and display options
-- Suitable for all markets: Crypto, Forex, Stocks, Commodities
+- Both indicators are written in Pine Script v6
+- Code is organized with clear section headers
+- Customizable colors, sizes, and display options
+- Most tools work on any market; the CME gap uses `CME:BTC1!` and is meant for BTC charts, and the Weekendicator is most useful on 24/7 markets such as crypto
+- Volume Profile needs volume data; on symbols without volume it has nothing to show
 - Can be used together or separately depending on your trading style
 
 ## ⚠️ Disclaimer
