@@ -227,7 +227,6 @@ priceLowest      := ta.lowest (low , profileLength > 0 ? profileLength + 1 : 1)
 priceStep        := (priceHighest - priceLowest) / profileLevels
 var pocLevel      = 0
 
-[_, _, tradedVolume1] = f_getHighLow(profileLength, true, 0)
 
 // Optimize: Check if nzVolume is greater than 0 (explicit boolean)
 if nzVolume > 0 and profileLength > 0 and priceStep > 0 and show_dvp
